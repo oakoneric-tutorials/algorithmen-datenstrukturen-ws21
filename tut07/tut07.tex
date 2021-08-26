@@ -1,0 +1,366 @@
+\documentclass{beamer}
+\usepackage{../tut-slides}
+\usepackage{../mathoperatorsAuD}
+
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{wasysym}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+%\usepackage[inline]{enumitem} 		%customize label
+%\newcommand{\labelitemi}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+%\newcommand{\labelitemii}{$\vartriangleright$}
+%\newcommand{\labelitemiii}{--}
+\setbeamertemplate{itemize item}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subitem}{$\vartriangleright$}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{tabu}
+\newcommand*\head{\rowfont{\bfseries}}
+\newcommand*{\tw}{\rowfont{\ttfamily}}
+\renewcommand{\tabularxcolumn}[1]{>{\hspace{0pt}}m{#1}}
+\usepackage{multirow}
+
+\usepackage{cancel}
+
+\usepackage{empheq}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em} #1 \hspace{2em}}}
+
+\usepackage{tcolorbox}
+\newtcolorbox{mymathbox}[1][]{colback=white, sharp corners, #1}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{bold-extra}
+\newcommand*{\ttfamilywithbold}{\fontfamily{lmtt}\selectfont}
+
+\lstset{numbers=left, 
+	numberstyle=\tiny, 
+	breaklines=true,
+	%	backgroundcolor=false,
+	numbersep=5pt,
+	language=C,
+	tabsize=2,
+	basicstyle=\footnotesize\ttfamilywithbold,
+	showstringspaces=false,
+	frame=tb} 
+
+\lstdefinestyle{notebook}{
+	basicstyle=\footnotesize\ttfamilywithbold,   
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	commentstyle=\itshape, 
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	backgroundcolor=\color{cdgray!10},
+	frame=single,
+	keywordstyle=\bfseries,       % keyword style
+	morekeywords={}, 
+	language=C,                 % the language of the code
+	numbers=left,                    % where to put the line-numbers; possible: (none, left, right)
+	numbersep=5pt,                   
+	numberstyle=\tiny\color{cdgray!50}, 
+	rulecolor=\color{cddarkblue}, 
+	tabsize=2,
+	frameround=tttt
+}
+
+\usepackage{qtree}
+\usepackage[edges]{forest}
+
+\begin{document}	
+	\title{Algorithmen und Datenstrukturen}
+	\subtitle{Übung 7: Bäume}
+	\author{Eric Kunze}
+	\email{eric.kunze@mailbox.tu-dresden.de}
+	\city{TU Dresden}
+%	\institute{Lehrstuhl für Grundlagen der Programmierung}
+	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
+	\date{11.12.2020}
+
+	\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile, t] \frametitle{Datenstrukturen}
+	\begin{lstlisting}[style=notebook]
+	typedef struct element *list;
+	struct element { int value; list next; };
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	typedef struct node *tree;
+	struct node { int key; tree left, right; };
+
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Teil (a) --- Erstellen eines neuen Knotens}
+	\textbf{Verknüpfen zweier Bäume mit einem neuen Wurzelnoten}
+	\pause
+	\begin{itemize}
+		\item lege neuen Wurzelknoten an
+		\item verknüpfe Wurzelknoten mit bestehenden Bäumen
+		\item fülle neue Wurzel mit Inhalt
+	\end{itemize}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	tree createNode(int n, tree l, tree r) {
+			tree t   = malloc(sizeof(struct node));
+			t->left  = l;
+			t->right = r;
+			t->key   = n;
+			return t;
+	}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Teil (a) --- Erstellen eines Baumes}
+	\textbf{Beispielbaum:}
+	\begin{center}
+		\begin{forest}
+			for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=10mm }
+			[4 	[5] [2 [0] [,no edge, draw=none]] ]
+		\end{forest}
+	\end{center}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	tree bsp = 
+		createNode(4,
+			createNode(5, NULL, NULL),
+			createNode(2,
+				createNode(0, NULL, NULL),
+				NULL));
+	\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile] \frametitle{Teil (b) --- links Einfügen}
+	\begin{tabularx}{\linewidth}{m{2cm} m{2cm} m{1.5cm} m{3cm}}
+		\textbf{Beispiel:}
+		&
+		\begin{forest}
+			for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=10mm }
+			[4 	[5] [2 [0] [,no edge, draw=none]] ]
+		\end{forest}
+		&
+		$\overset{\texttt{insertl(\&bsp)}}{\longrightarrow}$
+		&
+		\begin{forest}
+			for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+			[4 	[5 [18] [,no edge, draw=none]] [2 [0] [,no edge, draw=none]] ]
+		\end{forest}
+	\end{tabularx}
+	\pause
+	\begin{itemize}
+		\item solange kein Blatt erreicht: füge in den linken Teilbaum ein
+		\item am Blatt: ein neuen Knoten einfügen (\texttt{createNode})
+	\end{itemize}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	void insertl(tree *tp, int n) {
+			if (*tp != NULL)
+					insertl(&((*tp)->left), n);
+			else
+					*tp = createNode(n, NULL, NULL);
+	}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Teil (c) --- Produkt der Blätter}
+	\textbf{Beispiele:}
+	
+	\begin{center}
+		\begin{tabular}{ccc}
+			bsp & s & t \\ \\
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[4 	[5 [18] [,no edge, draw=none]] [2 [0] [,no edge, draw=none]] ]
+			\end{forest}
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[3 [2] [4]] [1] ]
+			\end{forest}
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[2] [3] ]
+			\end{forest} \\ \pause
+			\footnotesize \texttt{leafprod(bsp) = 0} &
+			\footnotesize \texttt{leafprod(s) = 8} &
+			\footnotesize \texttt{leafprod(t) = 6}
+		\end{tabular}
+	\end{center}
+\end{frame}
+\begin{frame}[fragile] \frametitle{Teil (c) --- Produkt der Blätter}
+	\begin{itemize}
+		\item leerer Baum: \texttt{leafprod = 1}
+		\item Rekursion: berechne \texttt{leafprod} in linkem und rechtem Teilbaum
+	\end{itemize}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	int leafprod(tree t){
+			if (t == NULL)
+					return 1;
+			if (t->left == NULL && t->right == NULL)
+					return t->key;
+			return leafprod(t->left) * leafprod(t->right);
+	}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} \frametitle{Teil (d) --- Blätter entfernen}
+	\textbf{Beispiel:}
+	\begin{center}
+		\begin{tabularx}{\linewidth}{m{3cm} m{1.5cm} m{2cm}}
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[4 	[5 [18] [,no edge, draw=none]] [2 [0] [,no edge, draw=none]] ]
+			\end{forest}
+			&
+			$\overset{\texttt{defol(\&bsp)}}{\longrightarrow}$
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[4 	[5] [2] ]
+			\end{forest}
+		\end{tabularx}
+	\end{center}
+	\pause
+	\begin{itemize}
+		\item Blatt: Knoten entfernen und Vorgänger auf \texttt{NULL} setzen
+		\item Rekursion: Lösche in linkem und rechtem Teilbaum
+	\end{itemize}
+\end{frame}
+\begin{frame}[fragile] \frametitle{Teil (d) --- Blätter entfernen}
+	
+	\begin{lstlisting}[style=notebook]
+	void defol(tree *tp){
+		if ( tp == NULL) return ;
+		if (*tp == NULL) return ;
+		
+		if ((*tp)-> left == NULL && (*tp)->right == NULL){
+				free(*tp);
+				*tp = NULL;
+		} else {
+				defol( &((*tp)->left)  );
+				defol( &((*tp)->right) );
+		}
+	}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Teil (e) --- Baum $\leadsto$ Liste}
+	Man übernehme nur gerade Elemente!
+	
+	\textbf{Beispiel:}
+	\begin{center}
+		\begin{tabularx}{\linewidth}{m{2cm} m{2cm} m{2cm}}
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[3 [2] [4]] [1] ]
+			\end{forest}
+			&
+			$\overset{\texttt{treeToList(s)}}{\longrightarrow}$
+			&
+			\begin{ttfamily}
+				[2, 4, 2]
+			\end{ttfamily}
+		\end{tabularx}
+	\end{center}
+	\pause
+	\textbf{Inorder -- Durchlauf:}
+	\begin{itemize}
+		\item traversiere durch linken Teilbaum
+		\item Wurzel gerade? $\to$ anhängen an Liste mit \texttt{append}
+		\item traversiere durch rechten Teilbaum
+	\end{itemize}
+\end{frame}
+\begin{frame}[fragile] \frametitle{Teil (e) --- Baum $\leadsto$ Liste}
+	\begin{lstlisting}[style=notebook]
+	void append(list *lp, int n)
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	void treeToList_rec(tree t, list *lp){
+			if (t == NULL) return ;
+			treeToList_rec(t->left, lp);
+			if (t->key % 2 == 0)
+					append(lp, t->key);
+			treeToList_rec(t->right, lp);
+	}	
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	list treeToList(tree t){
+			list l = NULL;
+			treeToList_rec(t,&l);
+			return l;
+	}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Teil (f) --- zähle Vorkommen}
+	
+	\textbf{Beispiel:}
+	\begin{center}
+		\begin{tabularx}{\linewidth}{m{1cm} m{2cm} m{0.2cm} m{1.7cm} m{1cm} m{2cm}}
+			\texttt{baz} $\Bigg($
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[3 [2] [4]] [1] ]
+			\end{forest}
+			&
+			\texttt{,}
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[2] [3] ]
+			\end{forest}
+			&
+			$\Bigg) \quad =$			
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[1 [2] [0]] [0] ]
+			\end{forest}
+		\end{tabularx}
+	\end{center}
+\end{frame}
+\begin{frame}[fragile] \frametitle{Teil (f) --- zähle Vorkommen}
+	
+	\begin{lstlisting}[style=notebook]
+	int count(tree t, int k) { 
+			/* zaehlt die anzahl der vorkommen von k in t */
+			if (t == NULL) return 0;
+			return (t->key == k) + count(t->left, k) + count(t->right, k);
+	}
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+	tree baz(tree s, tree t) {
+			if (s == NULL) return NULL;
+			tree result = malloc(sizeof(struct node));
+			result->key   = count(t, s->key);
+			result->left  = baz(s->left, t) ;
+			result->right = baz(s->right, t);
+			return result;
+	}
+	\end{lstlisting}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

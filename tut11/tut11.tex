@@ -1,0 +1,310 @@
+\documentclass{beamer}
+\usepackage{../tut-slides}
+\usepackage{../mathoperatorsAuD}
+
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{wasysym}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+%\usepackage[inline]{enumitem} 		%customize label
+%\newcommand{\labelitemi}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+%\newcommand{\labelitemii}{$\vartriangleright$}
+%\newcommand{\labelitemiii}{--}
+\setbeamertemplate{itemize item}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subitem}{$\vartriangleright$}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.10}   % in my packages used compat=1.15
+\usepgfplotslibrary{fillbetween}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{patterns,arrows, arrows.meta,calc,decorations.pathmorphing,backgrounds, positioning,fit,petri,decorations.fractals}
+\usetikzlibrary{matrix}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{tabu}
+\newcommand*\head{\rowfont{\bfseries}}
+\newcommand*{\tw}{\rowfont{\ttfamily}}
+\renewcommand{\tabularxcolumn}[1]{>{\hspace{0pt}}m{#1}}
+\usepackage{multirow}
+
+\usepackage{cancel}
+
+\usepackage{empheq}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em} #1 \hspace{2em}}}
+
+\usepackage{tcolorbox}
+\newtcolorbox{mymathbox}[1][]{colback=white, sharp corners, #1}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{numbers=left,
+	numberstyle=\tiny,
+	breaklines=true,
+	backgroundcolor=\color{cdgray!20},
+	numbersep=5pt,
+	language=C,
+	tabsize=2,
+	basicstyle=\footnotesize\ttfamily,
+	showstringspaces=false}
+
+\DeclareMathOperator{\ack}{\mathbf{ack}}
+\usepackage{MnSymbol}
+
+\newcommand{\col}[1]{\textcolor{cdpurple}{#1}}
+\newcolumntype{R}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage{tabularx}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+
+\usepackage{qtree}
+\usepackage[edges]{forest}
+\usepackage{csquotes}
+
+\begin{document}
+	\title{Algorithmen und Datenstrukturen}
+	\subtitle{Übung 11: Graphensuche \& Floyd-Warshall-Algorithmus}
+	\author{Eric Kunze}
+	\email{eric.kunze@mailbox.tu-dresden.de}
+	\city{TU Dresden}
+%	\institute{Lehrstuhl für Grundlagen der Programmierung}
+	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
+	\date{22.01.2021}
+
+	\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Breiten- und Tiefensuche}
+
+\begin{frame}[t] \frametitle{Suchverfahren}
+	\begin{itemize}
+		\item Ziel: Finden eines Knotens mit bestimmter Beschriftung in einem Graphen
+		\item hier: uninformierte Suche mit Tiefen- und Breitensuche
+	\end{itemize}
+
+	\bigskip 
+	
+	\begin{center}
+		\begin{tikzpicture}
+			\node [circle,draw] (1) at (-1.33,0)  {$1$};
+			\node [circle,draw] (2) at (0,1)  {$2$};
+			\node [circle,draw] (3) at (0,0) {$3$};
+			\node [circle,draw] (4) at (0,-1) {$4$};
+			
+			\node [circle,draw] (5) at (1.33,0)  {$5$};
+			
+			\node [circle,draw] (6) at (2.66,1)  {$6$};
+			\node [circle,draw] (7) at (2.66,0)  {$7$};
+			\node [circle,draw] (8) at (2.66,-1) {$8$};
+			
+			% Kanten
+			% \path (1) -- node[weight] {$3$} (3)
+			\draw (1) -- (2);
+			\draw (1) -- (3);
+			\draw (1) -- (4);
+			
+			\draw (2) -- (5);
+			\draw (3) -- (5);
+			\draw (4) -- (5);
+			\draw (5) -- (6);
+			\draw (6) -- (7);
+			\draw (7) -- (8);
+			\draw (5) -- (8);
+		\end{tikzpicture}
+	\end{center}
+	
+\end{frame}
+
+\begin{frame}[t] \frametitle{Tiefensuche}
+    \begin{itemize}
+    	\item gehe in die Tiefe: \enquote{entdecke erst Kinder, dann Geschwister}
+    	\item Datenstruktur: Keller
+    	\item Nachfolger werden \emph{oben} auf den Keller gelegt
+    	\item nächster Knoten wird \emph{oben} vom Keller genommen
+    \end{itemize}
+	
+	\bigskip 
+	
+	\textbf{Keller:}
+	\begin{center}
+		\begin{tikzpicture}[scale=0.5]
+			\foreach \y in {0,...,5}
+				\draw[color=cddarkblue] (0,\y) rectangle ++(2,-1);
+			\node[anchor=north east] (nachfolger) at (-3,5) {Nachfolger};
+			\draw[->, arrows=-Stealth, bend angle=45, bend left]  (nachfolger) to (1,5);
+			\node[anchor=south west] (next) at (4,4) {nächster Knoten};
+			\draw[->, arrows=-Stealth]  (2,4.5) to (next);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Breitensuche}
+    \begin{itemize}
+    	\item gehe in die Breite: \enquote{entdecke erst Geschwister, dann Kinder}
+    	\item Datenstruktur: Warteschlange
+    	\item Nachfolger werden \emph{hinten} stellen sich \emph{hinten} an
+    	\item nächster Knoten wird von \emph{vorn} genommen
+    \end{itemize}
+
+	\bigskip 
+	
+	\textbf{Warteschlange:}
+	\begin{center}
+		\begin{tikzpicture}[scale=0.5]
+			\foreach \x in {0,...,5}
+			\draw[color=cddarkblue] (\x,0) rectangle ++(1,1);
+			\node[anchor=south west] (nachfolger) at (9,1) {Nachfolger};
+			\draw[->, arrows=-Stealth, bend angle=45, bend right]  (nachfolger.west) to (6.5,1);
+			\node[anchor=north] (next) at (-1.5,-1) {nächster Knoten};
+			\draw[->, arrows=-Stealth, bend angle=45, bend right]  (0,0.5) to (next.north);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1}
+	\centering
+	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\includegraphics[height=15em]{./tut11_task2-graph.pdf}
+	\end{minipage}
+	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\begin{itemize}
+			\item[(a)] \textbf{Tiefensuche}: \\ 3 verschiedene depth-first trees 
+			\item[(b)] \textbf{Breitensuche}: \\ 3 verschiedene breadth-first trees
+		\end{itemize}
+	\end{minipage}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
+    \textbf{Tiefensuche}
+
+	Es gibt $5$ verschiedene depth-first-trees, z.B.:
+
+	\includegraphics[width=\linewidth]{./tut11_task2-dft.pdf}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
+    \textbf{Breitensuche}
+
+	Es gibt $5$ verschiedene breadth-first-trees, z.B.:
+
+	\includegraphics[width=\linewidth]{./tut11_task2-bft.pdf}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Floyd-Warshall-Algorithmus}
+
+\begin{frame} \frametitle{Floyd-Warshall-Algorithmus}
+	\begin{itemize}
+		\item gewichteter Graph $G = (V,E,c)$ mit Weglängen $c$ und ohne Schlingen
+		\item \textbf{Ziel}: kürzeste Wege von beliebigem Startknoten zu beliebigem Zielknoten
+		\item oBdA: $V = \menge{1, \dots, n}$
+		\item $P_{u,v} =$ Menge aller Wege von $u$ nach $v$
+		\item $D_G (u,v) = \begin{cases}
+		\min\menge{c_p : p \in P_{u,v}} & \text{wenn } P_{u,v} \neq \emptyset \\
+		\infty & \text{sonst}
+		\end{cases}$
+		\item $P^{(k)}_{u,v} =$ Menge aller Wege von $u$ nach $v$, deren innere Knoten in $\menge{1, \dots, k}$ liegen
+		\item $D_G^{(k)} (u,v) = \begin{cases}
+		\min\menge{c_p : p \in P_{u,v}^{(k)}} & \text{wenn } P_{u,v}^{(k)} \neq \emptyset \\
+		\infty & \text{sonst}
+		\end{cases}$
+		\item Es gilt $P^{(n)}_{u,v} = P_{u,v}$ und somit $D_G^{(n)} = D_G$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame} \frametitle{Floyd-Warshall-Algorithmus}
+	\begin{itemize}
+		\item modifizierte Adjazenzmatrix $mA_G = \min\menge{A_G, \mathbf{0}_n} = \begin{cases}
+		c(u,v) & \text{wenn } u \neq v, (u,v) \in E \\
+		0 & \text{wenn } u = v \\
+		\infty & \text{sonst}
+		\end{cases}$
+		\item \textbf{Initialisierung}: $D_G^{(0)} = mA_G$
+		\item \textbf{Rekursion}:
+		\begin{equation*}
+			\boxed{D_G^{(k+1)}(u,v) = \min\menge{D_G^{(k)}(u,v) , D_G^{(k)}(u,k+1) + D_G^{(k)}(k+1,v)}}
+		\end{equation*}
+	\end{itemize}
+\end{frame}
+\begin{frame} \frametitle{Aufgabe 2}
+	\begin{minipage}{\dimexpr0.42\linewidth-\fboxrule-\fboxsep}
+		\includegraphics[height=13em]{./tut11_task3-graph.pdf}
+	\end{minipage}
+	\pause
+	\begin{minipage}{\dimexpr0.58\linewidth-\fboxrule-\fboxsep}
+		\small
+		$mA_G = \begin{pmatrix}
+		0      & \infty & 3      & \infty & \infty & \infty & \infty \\
+		8      & 0      & \infty & 2      & \infty & \infty & \infty \\
+		\infty & \infty & 0      & \infty & \infty & \infty & \infty \\
+		4      & \infty & 8      & 0      & \infty & 3      & 6      \\
+		\infty & 4      & \infty & 7      & 0      & \infty & 15     \\
+		\infty & \infty & 3      & \infty & \infty & 0      & 2      \\
+		\infty & \infty & \infty & \infty & \infty & \infty & 0
+		\end{pmatrix}$
+	\end{minipage}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
+	\begin{equation*}
+		D_G^{(2)} = \begin{pmatrix}
+		0      & \infty & 3      & \infty & \infty & \infty & \infty \\
+		8      & 0      & \textcolor{cdpurple}{11}     & 2      & \infty & \infty & \infty \\
+		\infty & \infty & 0      & \infty & \infty & \infty & \infty \\
+		4      & \infty & \textcolor{cdpurple}{7}     & 0      & \infty & 3      & 6      \\
+		\textcolor{cdgreen}{12}     & 4      & \textcolor{cdgreen}{15}     & \textcolor{cdgreen}{6}      & 0      & \infty & 15     \\
+		\infty & \infty & 3      & \infty & \infty & 0      & 2      \\
+		\infty & \infty & \infty & \infty & \infty & \infty & 0
+		\end{pmatrix}
+	\end{equation*}
+	d.h. es ändern sich folgende Einträge:
+	\begin{equation*}
+		\underbrace{\textcolor{cdpurple}{(4,3,7), (2,3,11)}}_{\text{aus } D_G^{(1)}}, \underbrace{\textcolor{cdgreen}{(5,3,15), (5,1,12), (5,4,6)}}_{\text{aus } D_G^{(2)}}
+	\end{equation*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (c)}
+	Für $k \in \menge{4,6}$, d.h. durch Zulassen der Knoten $4$ und $6$ als innere Knoten eines Weges, erreichen wir eine Verbesserung. Dagegen sind die Knoten $3$ und $7$ \textit{Senken}, d.h. es bringt nichts, diese zu besuchen, weil wir nicht wieder weg kommen. Ebenso bringt uns der Knoten $5$ als \textit{Quelle} keine Verbesserung, weil wir diesen gar nicht erreichen können.
+	Somit gilt also
+	\begin{equation*}
+		D_G^{(2)} = D_G^{(3)} \qquad D_G^{(4)} = D_G^{(5)} \qquad D_G^{(6)} = D_G^{(7)}
+	\end{equation*}
+	und wir müssen lediglich $D_G^{(4)}$ sowie $D_G^{(6)}$ explizit berechnen.
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (d)}
+	\small
+	\begin{equation*}
+	\begin{aligned}
+		D_G^{(4)} &= \begin{pmatrix}
+		0      & \infty & 3      & \infty & \infty & \infty & \infty \\
+		\alert{6}      & 0      & \alert{9}     & 2      & \infty & \alert{5} & \alert{8} \\
+		\infty & \infty & 0      & \infty & \infty & \infty & \infty \\
+		4      & \infty & 11     & 0      & \infty & 3      & 6      \\
+		\alert{10}     & 4      & \alert{13}     & 6      & 0      & \alert{9} & \alert{12}     \\
+		\infty & \infty & 3      & \infty & \infty & 0      & 2      \\
+		\infty & \infty & \infty & \infty & \infty & \infty & 0
+		\end{pmatrix}
+		= D_G^{(5)} \\
+		D_G^{(6)} &= \begin{pmatrix}
+		0          & \infty & 3          & \infty & \infty & \infty & \infty \\
+		6          & 0      & \alert{8}  & 2      & \infty & 5      & \alert{7} \\
+		\infty     & \infty & 0          & \infty & \infty & \infty & \infty \\
+		4          & \infty & \alert{6}  & 0      & \infty & 3      & \alert{5}     \\
+		10         & 4      & \alert{12} & 6      & 0      & 9      & \alert{11}     \\
+		\infty     & \infty & 3          & \infty & \infty & 0      & 2      \\
+		\infty     & \infty & \infty     & \infty & \infty & \infty & 0
+		\end{pmatrix}
+		= D_G^{(7)} = D_G
+	\end{aligned}
+	\end{equation*}
+\end{frame}
+\end{document}

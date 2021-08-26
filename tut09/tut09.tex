@@ -1,0 +1,578 @@
+\documentclass{beamer}
+\usepackage{../tut-slides}
+\usepackage{../mathoperatorsAuD}
+
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{wasysym}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+%\usepackage[inline]{enumitem} 		%customize label
+%\newcommand{\labelitemi}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+%\newcommand{\labelitemii}{$\vartriangleright$}
+%\newcommand{\labelitemiii}{--}
+\setbeamertemplate{itemize item}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subitem}{$\vartriangleright$}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{tabu}
+\newcommand*\head{\rowfont{\bfseries}}
+\newcommand*{\tw}{\rowfont{\ttfamily}}
+\renewcommand{\tabularxcolumn}[1]{>{\hspace{0pt}}m{#1}}
+\usepackage{multirow}
+
+\usepackage{cancel}
+
+\usepackage{empheq}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em} #1 \hspace{2em}}}
+
+\usepackage{tcolorbox}
+\newtcolorbox{mymathbox}[1][]{colback=white, sharp corners, #1}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{numbers=left, 
+	numberstyle=\tiny, 
+	breaklines=true,
+	backgroundcolor=\color{cdgray!20},
+	numbersep=5pt,
+	language=C,
+	tabsize=2,
+	basicstyle=\footnotesize\ttfamily,
+	showstringspaces=false} 
+
+\usepackage{MnSymbol}
+
+\newcommand{\col}[1]{\textcolor{cdpurple}{#1}}
+\newcolumntype{R}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage{tabularx}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+
+\usepackage{qtree}
+\usepackage[edges]{forest}
+
+\usepackage{csquotes}
+
+\begin{document}	
+	\title{Algorithmen und Datenstrukturen}
+	\subtitle{Übung 9: Suchen \& Ersetzen}
+	\author{Eric Kunze}
+	\email{eric.kunze@mailbox.tu-dresden.de}
+	\city{TU Dresden}
+%	\institute{Lehrstuhl für Grundlagen der Programmierung}
+	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
+	\date{08.01.2021}
+
+	\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{KMP-Algorithmus \\ \textit{Aufgabe 1}} 
+
+\begin{frame} \frametitle{KMP-Algorithmus}
+	\begin{itemize}
+		\item Mustersuche in (großen) Texten
+		\item Ziel: Verschiebung des Musters um mehr als eine Position bei Nichtübereinstimmung.
+		\item Methode: Ermittlung einer Verschiebetabelle {\large $\texttt{Tab[]}$} in \textbf{Phase 1}
+		\item Bedeutung des Eintrags {\large $\texttt{Tab[i]=j}$}: \\
+		\textit{Bei Nichtübereinstimmung an Stelle $i$ wird Position $j$ des Musters an aktueller Vergleichsstelle angelegt.}
+		\item Suchprozess in \textbf{Phase 2}
+	\end{itemize}
+
+	\textbf{j-algo:} \url{http://j-algo.binaervarianz.de/}
+\end{frame}
+
+\begin{frame} \frametitle{KMP-Algorithmus}
+	\small
+	Suche das Muster \texttt{aaabaaaa} im Text \texttt{aaabaaabaaacaaabaaaa}.
+	\begin{center}
+		\footnotesize
+		\begin{tabular}{l|cccccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 &  6 &  7 \\ \hline
+			Pattern  &  a &  a &  a &  b &  a &  a &  a &  a \\ \hline
+			Tabelle  & -1 & -1 & -1 &  2 & -1 & -1 & -1 &  3 \\
+		\end{tabular}
+	\end{center}
+	
+	\rule{\textwidth}{0.4pt}
+	
+	\renewcommand*{\arraystretch}{.7}
+	\setlength{\tabcolsep}{1pt}
+	
+	Erster Versuch:
+	\begin{center}
+		\begin{tabular}{ccccccccccccccccccccc}
+			a & a & a & b & a & a & a & \textbf{b} & a & a & a & c & a & a & a & b & a & a & a & a \\
+			a & a & a & b & a & a & a & \textbf{a}
+		\end{tabular}
+	\end{center}
+	Tabelleneintrag an Position $7$ ist $3$, d.h. $\texttt{Tab[7]=3}$ --- Lege Position $3$ des Musters an aktueller Vergleichsposition an:
+	\begin{center}
+		\begin{tabular}{ccccccccccccccccccccc}
+			a & a & a & b & a & a & a & b & a & a & a & \textbf{c} & a & a & a & b & a & a & a & a \\
+			&   &   &   & a & a & a & b & a & a & a & \textbf{a}
+		\end{tabular}
+	\end{center}
+	Gleicher Prozess noch einmal: Missmatch an Position 7 des Musters --- verschiebe Muster auf Position 3.
+\end{frame}
+
+\begin{frame} \frametitle{KMP-Algorithmus (Fortsetzung)}
+	\small
+	Suche das Muster \texttt{aaabaaaa} im Text \texttt{aaabaaabaaacaaabaaaa}.
+	\begin{center}
+		\footnotesize
+		\begin{tabular}{l|cccccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 &  6 &  7 \\ \hline
+			Pattern  &  a &  a &  a &  b &  a &  a &  a &  a \\ \hline
+			Tabelle  & -1 & -1 & -1 &  2 & -1 & -1 & -1 &  3 \\
+		\end{tabular}
+	\end{center}
+
+	\rule{\textwidth}{0.4pt}
+	
+	\renewcommand*{\arraystretch}{.7}
+	\setlength{\tabcolsep}{1pt}
+	
+	Wir legen das Muster also wieder an Position $3$ an:
+	\begin{center}
+		\begin{tabular}{ccccccccccccccccccccc}
+			a & a & a & b & a & a & a & b & a & a & a & \textbf{c} & a & a & a & b & a & a & a & a \\
+			&   &   &   &  &  &  &  & a & a & a & \textbf{b} & a & a & a & a
+		\end{tabular}
+	\end{center}
+	Wegen $\texttt{Tab[3]=2}$, lege Muster an Position $2$ an:
+	\begin{center}
+		\begin{tabular}{ccccccccccccccccccccc}
+			a & a & a & b & a & a & a & b & a & a & a & \textbf{c} & a & a & a & b & a & a & a & a \\
+			&   &   &   &  &  &  &  &  & a & a & \textbf{a} & b & a & a & a & a
+		\end{tabular}
+	\end{center}
+	Wegen $\texttt{Tab[2]=-1}$, lege Muster an Position $-1$ an:
+	\begin{center}
+		\begin{tabular}{ccccccccccccccccccccc}
+			a & a & a & b & a & a & a & b & a & a & a & c & a & a & a & b & a & a & a & a \\
+			&   &   &   &   &   &   &   &   &   &   &   & a & a & a & b & a & a & a & a &
+		\end{tabular}
+	$\smiley$
+	\end{center}
+\end{frame}
+
+
+\begin{frame} \frametitle{KMP-Algorithmus --- Die Zyklenmethode}
+	Zwei Phasen:
+	\pause
+	\begin{itemize}
+		\item \textbf{1. Phase:} Markieren der längsten Teilwörter im Pattern, die mit einem Präfix übereinstimmen
+		\begin{itemize}
+			\item ein Zyklus beginnt an einer Patternposition $\texttt{i}$ falls $\texttt{i} \neq \texttt{0}$ und $\texttt{Pat[0] = Pat[i]}$
+			\item ein Zyklus endet an der kleisten Patternposition $\texttt{i+m}$, sodass $\texttt{Pat[m+1]} \neq \texttt{Pat[i+m+1]}$
+		\end{itemize}
+		\pause
+		\item \textbf{2. Phase:} Bestimmung der Tabelleneinträge
+		\begin{itemize}
+			\item $\texttt{Tab[0] = -1}$
+			\item Tabelleneinträge nach einem Zyklus: \\
+			\textit{Länge des längsten dort endenden Zyklus}
+			\item Tabelleneinträgen in einem Zyklus: \\
+			\textit{Tabelleneintrag der derzeitigen Position im längsten laufenden Zyklus}
+			\item verbleibende Einträge: \texttt{0}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1}
+	
+	\begin{itemize}
+		\item[(a)] Geben Sie zu dem Pattern \texttt{aabaaacaab} die mit Hilfe des KMP-Algorithmus (Knuth-Morris-Pratt) berechnete Verschiebetabelle an.
+		\item[(b)] Mit Hilfe des KMP-Algorithmus ist die unten stehende Verschiebetabelle berechnet worden: Vervollständigen Sie das aus den Symbolen \texttt{a}, \texttt{b} und \texttt{c} bestehende Pattern.
+	\end{itemize}
+	
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.1} \setlength{\tabcolsep}{16pt}
+		\begin{tabular}{l|cccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 \\ \hline
+			Pattern  &  c & b  &   &  &  &  a \\ \hline
+			Tabelle  & -1 &  0 & -1 & 1 & 0 &  2 \\
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 1 --- Zyklenmethode \hfill \only<2->{\alert{Lösung}}}
+	\textbf{Teil (a)} \hspace{3em}
+	Pattern: {\large \texttt{aabaaacaab}} \\[1em]
+	
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.3} \setlength{\tabcolsep}{8pt}
+		\begin{tabular}{l|cccccccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 &  6 &  7 &  8 &  9 \\ \hline
+			Pattern  &  a &  a &  b &  a &  a &  a &  c &  a &  a &  b \\ \hline
+			Tabelle  & \only<2->{-1 & -1 &  1 & -1 & -1 &  2 &  2 & -1 & -1 &  1} \\
+		\end{tabular}
+	\end{center}
+\end{frame}
+	
+
+
+\begin{frame} \frametitle{KMP-Algorithmus --- Die Zwei-Finger-Methode}
+	Die Methode beruht auf der Gleichung
+	\begin{equation*}
+		\begin{aligned}
+		\small
+		\texttt{Tab[i]}
+		= \max \menge{-1} \cup \menge{m \; \middle| \;
+			\setlength{\arraycolsep}{2pt}
+			 \begin{array}{rcl}
+				0 \le &m& \le i-1 \\
+				b_0 \dots b_{m-i} &=& b_{i-m} \dots b_{i-1} \\
+				b_m &\neq& b_j \\
+			\end{array} }
+		\end{aligned} \tag{$\star$} \label{eq: kmp}
+	\end{equation*}
+	Daraus ergibt sich nach Initialisierung von $\texttt{Tab[0]} = -1$ für jeden folgenden Eintrag $\texttt{Tab[i]}$ folgendes Verfahren:
+	\begin{itemize}
+		\item \textit{linker Finger}: wähle $m < i$ in absteigender Reihenfolge (also $i-1$, $i-2$, $\dots$), sodass $\texttt{Pat[i]} \neq \texttt{Pat[m]}$
+		\item \textit{Parallelverschiebung beider Finger bis zum linken Rand}: wenn $\texttt{Pat[0\dots m-1]} = \texttt{Pat[i-m\dots i-1]}$, dann fülle $\texttt{Tab[i]} = m$.
+		\item wenn keine passende Position $m$ gefunden werden kann, dann fülle $\texttt{Tab[i]} = -1$.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[t] \frametitle{Aufgabe 1 --- Zwei-Finger-Methode \hfill \only<2->{\alert{Lösung}}}
+	\textbf{Teil (a)} \hspace{3em}
+	Pattern: {\large \texttt{aabaaacaab}} \\[1em]
+	
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.3} \setlength{\tabcolsep}{8pt}
+		\begin{tabular}{l|cccccccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 &  6 &  7 &  8 &  9 \\ \hline
+			Pattern  &  a &  a &  b &  a &  a &  a &  c &  a &  a &  b \\ \hline
+			Tabelle  & \only<2->{-1 & -1 &  1 & -1 & -1 &  2 &  2 & -1 & -1 &  1} \\
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}[t] \frametitle{Aufgabe 1 --- Teil (b) \hfill \only<2->{\alert{Lösung}}}
+	\textbf{Teil (b)} % \\[1em]
+	
+	\vspace{-1.5\baselineskip}
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.3} \setlength{\tabcolsep}{16pt}
+		\begin{tabular}{l|cccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 \\ \hline
+			Pattern  &  c &  b &  \visible<2->{\textit{c}} &  \visible<2->{\textit{c}} &  \visible<2->{\textit{b}} &  a \\ \hline
+			Tabelle  & -1 &  0 & -1 &  1 &  0 &  2 \\
+		\end{tabular}
+	\end{center}
+
+	\footnotesize
+	\begin{itemize}[<2->]
+		\item $\texttt{Pat[0\dots 1] = Pat[3\dots 4]}$ wegen $\texttt{Tab[5] = 2}$ (Zyklenmethode), d.h. $\texttt{Pat[3] = Pat[0] = c}$ und $\texttt{Pat[4] = Pat[1] = b}$
+		\item wegen $\texttt{Tab[3] = 1}$ ist $\texttt{Pat[2] = \texttt{Pat[0]} = c}$ (Zyklenmethode) 
+		\item \textbf{oder:} wegen $\texttt{Tab[3] = 1}$ ist $\texttt{Pat[1]} \neq \texttt{Pat[3]}$ und $\texttt{Pat[2] = Pat[0] = c}$ (Parallelverschiebung in der Zwei-Finger-Methode bzw. Gleichung \eqref{eq: kmp})
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Levenshtein-Distanz \\ \textit{Aufgabe 2}}
+
+\begin{frame} \frametitle{Levenshtein-Distanz}
+	\textbf{Kosten} zur Überführung eines Wortes $w = w_1 \dots w_n$ in ein Wort $v = v_1 \dots v_k$ ; schreibe $d(w_1 \dots w_j, v_1 \dots v_i) = d(j,i)$.
+	\pause
+	\begin{align*}
+		d(0,i) &= i \\
+		d(j,0) &= j \\
+		d(j,i) &= \min \menge{ d(j,i-1) + 1, d(j-1,i) + 1 , d(j-1, i-1) + \delta_{j,i}}
+	\end{align*}
+	für alle $1 \le j \le n$ und alle $1 \le i \le k$ wobei
+	\begin{equation*}
+		\delta_{j,i} = \begin{cases}
+		1 & \text{wenn } w_j \neq v_i \\
+		0 & \text{sonst}
+		\end{cases} 
+	\end{equation*}
+	\pause
+	\textbf{Anschaulich:} 
+	Überlagerung durch Pattern
+	$\to$ Pfeile zeigen ''Ursprung`` des Minimums an
+	\begin{equation*}
+		w_j \neq v_i : \quad \begin{array}{|c|c|}
+			\hline +1 & +1 \\ \hline +1 & ? \\ \hline
+		\end{array}
+		\qquad \qquad
+		w_j = v_i : \quad 
+		\begin{array}{|c|c|}
+		\hline +0 & +1 \\ \hline +1 & ? \\ \hline
+		\end{array}
+	\end{equation*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2}
+	Gegeben seien die Wörter $w = \texttt{espen}$ und $v = \texttt{beispiele}$.
+	\begin{itemize}
+		\item[(a)] Berechnen Sie die Levenshtein-Distanz $d(w,v)$. Geben Sie dazu die Berechnungsmatrix an. Tragen Sie alle Zelleneinträge zusammen mit den dazugehörigen Pfeilen ein.
+		\item[(b)] Geben Sie die Levenshtein-Distanz $d(\texttt{espe},\texttt{beispiel})$ an. Beachten Sie, dass \texttt{espe} und \texttt{beispiel} Präfixe von \texttt{espen} bzw. \texttt{beispiele} sind.
+		\item[(c)] Geben Sie zwei Alignments zwischen \texttt{espen} und \texttt{beispiele} an, die zu den minimalen Kosten führen. Dabei sollen die Alignments die jeweils angewendeten Editieroperation enthalten.
+		\item[(d)] Wieviele Alignments enthält die in Aufgabe (a) angegebene Berechnungsmatrix?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 2 \hfill \only<2->{\alert{Lösung}}}
+	\textbf{Teil (a)} \hspace{1cm} \only<2->{$d(\text{espen}, \text{beispiele}) = 5$}
+	
+	\begin{center}
+	
+	\renewcommand*{\arraystretch}{.7}
+	\setlength{\tabcolsep}{3pt}
+	\begin{tabu}{>{\bfseries}c|ccccccccccccccccccc}
+		\rowfont{\bfseries} $d(j,i)$ &       &       & b     &       & e     &       & i     &       & s     &       & p     &       & i     &       & e     &       & l     &       & e \\ \hline  \\
+		& \visible<2->{ 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7     & $\rightarrow$ & 8     & $\rightarrow$ & 9} \\
+		& \visible<2->{       & $\searrow$ &       & $\searrow$ &       &       &       &       &       &       &       &       &       & $\searrow$ &       &       &       & $\searrow$ &  } \\
+		e     & \visible<2->{ 1     &       & 1     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7     & $\rightarrow$ & 8 } \\
+		& \visible<2->{ $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ &       &       &       &       &       &       &       &       &       &       &  } \\
+		s     & \visible<2->{ 2     &       & 2     &       & 2     &       & 2     &       & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 } \\
+		& \visible<2->{ $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       &       &       &       &       &       &       &       &  } \\
+		p     & \visible<2->{ 3     &       & 3     &       & 3     &       & 3     &       & 3     &       & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6 } \\
+		& \visible<2->{ $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ &       & $\downarrow$ & $\searrow$ &       & $\searrow$ &       &       &       & $\searrow$ &  } \\
+		e     & \visible<2->{ 4     &       & 4     &       & 3     & $\rightarrow$ & 4     &       & 4     &       & 3     &       & 3     &       & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5 } \\
+		& \visible<2->{ $\downarrow$ & $\searrow$ & $\downarrow$ &       & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ &       & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ &  } \\
+		n     & \visible<2->{ 5     &       & 5     &       & 4     &       & 4     & $\rightarrow$ & 5     &       & 4     &       & 4     &       & 4     &       & 4     & $\rightarrow$ & 5 } \\
+	\end{tabu}
+
+	\end{center}
+
+	\only<3->{\textbf{Teil (b)} \hspace{1cm} $d(\text{espe}, \text{beispiel}) = 4$}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 2 \hfill \only<2->{\alert{Lösung}}}
+	
+	\textbf{Teil (c)} \hspace{0.7cm} 		
+	Alignments mit minimaler Levenshtein-Distanz:
+	
+	\visible<2->{%
+	\begin{center}
+		\small
+		\begin{tabular}{ccccccccc}
+			$\ast$ & e & $\ast$ & s & p & $\ast$ & e & $\ast$ & n \\
+			$|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ \\
+			b   &  e  &  i  & s & p & i & e & l & e \\
+			\textit{i} &   & \textit{i} &   &   & \textit{i}  &  & \textit{i} & \textit{s} \\
+		\end{tabular}
+	
+		\begin{tabular}{ccccccccc}
+			$\ast$ & e & $\ast$ & s & p & $\ast$ & e & n & $\ast$ \\
+			$|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ \\
+			b   &  e  &  i  & s & p & i & e & l & e \\
+			\textit{i} &   & \textit{i} &   &   & \textit{i}  &  & \textit{s} & \textit{i} \\
+		\end{tabular}
+	\end{center} %
+	}
+
+	\textbf{Teil (d)} \hspace{0.7cm} \visible<2->{2 Alignments = 2 Backtraces}
+\end{frame}
+
+
+\section{Weitere Aufgaben aus der Aufgabensammlung \\ \textit{mit Lösungen}}
+
+\begin{frame} \frametitle{Aufgabe 7.1.13 (AGS)}
+	
+	\begin{itemize}
+		\item[(a)] Bestimmen Sie die mit Hilfe des KMP-Algorithmus berechnete Verschiebetabelle für das Pattern \texttt{abbabbaa}.
+		\item[(b)] Mit Hilfe des KMP-Algorithmus ist unten stehende Verschiebetabelle berechnet worden. Die mit einem \enquote{?} markierten Einträge sind unbekannt. Vervollständigen Sie das aus den Symbolen \texttt{a}, \texttt{b} und \texttt{c} bestehende Pattern. 
+	\end{itemize}
+		
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.1} \setlength{\tabcolsep}{16pt}
+		\begin{tabular}{l|cccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 \\ \hline
+			Pattern  &  \textit{b} &   &   &  &  &  \textit{c} \\ \hline
+			Tabelle  & -1 &  ? & ? &  0 &  ? &  3 \\
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 7.1.13 (AGS) \hfill \only<2,3>{\alert{Lösung}}}
+	\textbf{Teil (a)} \hspace{3em}
+	Pattern: {\large \texttt{abbabbaa}} \\[1em]
+	
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.1} \setlength{\tabcolsep}{10pt}
+		\begin{tabular}{l|cccccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 &  6 &  7  \\ \hline
+			Pattern  &  a &  b &  b &  a &  b &  b &  a &  a  \\ \hline
+			Tabelle  & \only<2->{ -1 &  0 &  0 & -1 &  0 &  0 & -1 &  4 } \\
+		\end{tabular}
+	\end{center}
+	
+	\pause
+	
+	\textbf{Teil (b)}
+	\vspace{-1.5\baselineskip}
+	\begin{center}
+		\renewcommand*{\arraystretch}{1.1} \setlength{\tabcolsep}{16pt}
+		\begin{tabular}{l|cccccc}
+			Position &  0 &  1 &  2 &  3 &  4 &  5 \\ \hline
+			Pattern  &  \textit{b} &  \onslide+<3->{a} &  \onslide+<3->{b} &  \onslide+<3->{a} &  \onslide+<3->{b} &  \textit{c} \\ \hline
+			Tabelle  & -1 &  ? & ? &  0 &  ? &  3 \\
+		\end{tabular}
+	\end{center}
+	
+	\pause
+	
+	\footnotesize
+	\begin{itemize}[<3->]
+		\item $\texttt{Pat[0 ... 2] = Pat[2 ... 4]}$ wegen $\texttt{Tab[5] = 3}$ (Zyklenmethode), d.h. $\texttt{Pat[2] = Pat[0] = Pat[4] = b}$
+		\item wegen $\texttt{Tab[3] = 0}$ ist $\texttt{Pat[3]} \neq  \texttt{Pat[0] = b}$ und wegen $\texttt{Tab[5] = 3}$ ist $\texttt{Pat[3]} \neq \texttt{Pat[5] = c}$ (Zwei-Finger-Methode bzw. Gleichung \eqref{eq: kmp}) \\
+		$\Rightarrow \texttt{Pat[3] = Pat[1] = a}$
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame} \frametitle{Aufgabe 7.2.1 (AGS)}
+	Gegeben seien die Wörter $w = \texttt{Dinstas}$ und $v = \texttt{Distanz}$.
+	\begin{itemize}
+		\item[(a)] Berechnen Sie die Levenshtein-Distanz $d(w,v)$ zwischen $w$ und $v$. Geben Sie die Berechnungsmatrix vollständig an.
+		\item[(b)] Geben Sie alle Alignments mit minimaler Levenshtein-Distanz zwischen $w$ und $v$ an.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 7.2.1 (AGS) \hfill \only<2->{\alert{Lösung}}}
+		\centering
+		\renewcommand*{\arraystretch}{.7}
+		\setlength{\tabcolsep}{3pt}
+			\begin{tabular}{l|ccccccccccccccc}
+				$d(j,i)$ &       &       & \textbf{D} &       & \textbf{i} &       & \textbf{s} &       & \textbf{t} &       & \textbf{a} &       & \textbf{n} &       & \textbf{z} \\ \hline \\
+				& \visible<2->{ 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 } \\
+				& \visible<2->{$\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &       &       &       &       &       &       &       &       &  } \\
+				\textbf{D}     & \visible<2->{1     &       & 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6 } \\
+				& \visible<2->{$\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &       &       &       &       &       &       &  } \\
+				\textbf{i}     & \visible<2->{2     &       & 1     &       & 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5 } \\
+				& \visible<2->{$\downarrow$ &       & $\downarrow$ &       & \alert<3->{$\downarrow$} & $\searrow$ &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ &       &       &  } \\
+				\textbf{n}     & \visible<2->{3     &       & 2     &       & 1     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     &       & 3     & $\rightarrow$ & 4 } \\
+				& \visible<2->{$\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ &  } \\
+				\textbf{s}     & \visible<2->{4     &       & 3     &       & 2     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     &       & 4 } \\
+				& \visible<2->{$\downarrow$ &       & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &       &       &  } \\
+				\textbf{t}     & \visible<2->{5     &       & 4     &       & 3     &       & 2     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4 } \\
+				& \visible<2->{$\downarrow$ &       & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &  } \\
+				\textbf{a}     & \visible<2->{6     &       & 5     &       & 4     &       & 3     &       & 2     &       & 1     & \alert<3-3>{$\rightarrow$} & 2     & $\rightarrow$ & 3 } \\
+				& \visible<2->{$\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & $\searrow$ & $\downarrow$ &       & $\downarrow$ &       & $\downarrow$ & \alert<4->{$\searrow$} &       & \alert<3-3>{$\searrow$} &  } \\
+				\textbf{s}     & \visible<2->{7     &       & 6     &       & 5     &       & 4     &       & 3     &       & 2     &       & 2     & \alert<4->{$\rightarrow$} & 3 } \\
+			\end{tabular}
+		
+		\pause
+		\begin{equation*}
+			d(\text{Dinstas}, \text{Distanz}) = 3
+		\end{equation*}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 7.2.1 (AGS) \hfill \only<2->{\alert{Lösung}}}
+	Alignments mit minimaler Levenshtein-Distanz:
+	
+	\centering
+	\visible<2->{
+	\begin{tabular}{cccccccc}
+		D & i & n & s & t & a & $\ast$ & s \\
+		$|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ \\
+		D & i & $\ast$ & s & t & a & n & z \\
+		  &   & \textit{d} &   &   &   & \textit{i} & \textit{s} \\
+	\end{tabular}
+
+	\vspace{3em}
+	
+	\begin{tabular}{cccccccc}
+		D & i & n & s & t & a & s & $\ast$ \\
+		$|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ & $|$ \\
+		D & i & $\ast$ & s & t & a & n & z \\
+		&   & \textit{d} &   &   &   & \textit{s} & \textit{i} \\
+	\end{tabular}
+	}
+\end{frame}
+
+
+\begin{frame} \frametitle{Aufgabe 7.2.2 (AGS)}
+	\begin{itemize}
+		\item[(a)] Berechnen Sie die Levenshtein-Distanz $d(\texttt{bürste}, \texttt{schürze})$. Geben Sie die Berechnungsmatrix vollständig an. Wieviele Backtraces enthält die Berechnungsmatrix?
+		\item[(b)] Geben Sie zwei Alignments mit minimaler Levenshtein-Distanz zwischen den Wörtern
+		\texttt{bürst} und \texttt{sch} an.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 7.2.2 (AGS) --- Teil (a) \hfill \only<2->{\alert{Lösung}}}
+	\centering
+	\renewcommand*{\arraystretch}{.7}
+	\setlength{\tabcolsep}{3pt}
+	\begin{tabular}{l|rrrrrrrlrrrlrlr}
+		$d(j,i)$ &       &       & \textbf{s} &       & \textbf{c} &       & \textbf{h} &       & \textbf{ü} &       & \textbf{r} &       & \textbf{z} &       & \textbf{e} \\ \hline \\
+		& \visible<2->{0     & \alert<3->{$\rightarrow$} & 1     & \alert<3->{$\rightarrow$} & 2     & $\rightarrow$ & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 } \\
+		& \visible<2->{$\downarrow$ & \alert<4->{$\searrow$} &       & \alert<4->{$\searrow$} &       & \alert<3->{$\searrow$} &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ &       & $\searrow$ &  } \\
+		\textbf{b}     & \visible<2->{1     &       & 1     & \alert<4->{$\rightarrow$} & 2     & \alert<4->{$\rightarrow$} & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6     & $\rightarrow$ & 7 } \\
+		& \visible<2->{$\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ &       & \alert<3->{$\searrow$} &       &       &       &       &       &       &  } \\
+		\textbf{ü}     & \visible<2->{2     &       & 2     &       & 2     & $\rightarrow$ & 3     &       & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5     & $\rightarrow$ & 6 } \\
+		& \visible<2->{$\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & \alert<3->{$\searrow$} &       &       &       &       &  } \\
+		\textbf{r}     & \visible<2->{3     &       & 3     &       & 3     &       & 3     & $\rightarrow$ & 4     &       & 3     & $\rightarrow$ & 4     & $\rightarrow$ & 5 } \\
+		& \visible<2->{$\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       &       & \alert<4->{$\downarrow$} & \alert<3->{$\searrow$} &       & $\searrow$ &  } \\
+		\textbf{s}     & \visible<2->{4     &       & 3     & $\rightarrow$ & 4     &       & 4     &       & 4     &       & 4     &       & 4     & $\rightarrow$ & 5 } \\
+		& \visible<2->{$\downarrow$ &       & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & \alert<4->{$\searrow$} & \alert<3->{$\downarrow$} & $\searrow$ &  } \\
+		\textbf{t}     & \visible<2->{5     &       & 4     &       & 4     & $\rightarrow$ & 5     &       & 5     &       & 5     &       & 5     &       & 5 } \\
+		& \visible<2->{$\downarrow$ &       & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ &       & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & $\searrow$ & $\downarrow$ & \alert<3->{$\searrow$} &  } \\
+		\textbf{e}     & \visible<2->{6     &       & 5     &       & 5     &       & 5     & $\rightarrow$ & 6     &       & 6     & & 6     &  & 5 } \\
+	\end{tabular}%
+
+	\pause
+
+	\begin{equation*}
+		d(\text{bürste}, \text{schürze}) = 5 \qquad \pause \pause \pause \text{Anzahl der Backtraces } = 3 * 2 = 6
+	\end{equation*}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 7.2.2 (AGS) --- Teil (b) \hfill \only<2->{\alert{Lösung}}}
+	Alignments mit minimaler Levenshtein-Distanz zwischen den Wörtern
+	\texttt{bürst} und \texttt{sch}
+	
+	\visible<2->{
+	\centering
+	\renewcommand*{\arraystretch}{.7}
+	\setlength{\tabcolsep}{3pt}
+	\begin{tabular}{l|ccccccc}
+		$d(j,i)$ &       &       & \textbf{s} &       & \textbf{c} &       & \textbf{h}  \\ \hline \\
+		& 0     & $\rightarrow$ & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3  \\
+		& \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} &       & $\searrow$ &       & $\searrow$ &  \\
+		\textbf{b}     & 1     &       & 1     & $\rightarrow$ & 2     & $\rightarrow$ & 3  \\
+		& \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} &       & $\searrow$ &   \\
+		\textbf{ü}     & 2     &       & 2     &       & 2     & $\rightarrow$ & 3  \\
+		& \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \\
+		\textbf{r}     & 3     &       & 3     &       & 3     &       & 3 \\
+		& $\downarrow$ & \alert<2->{$\searrow$} &       & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$}  \\
+		\textbf{s}     & 4     &       & 3     & \alert<2->{$\rightarrow$} & 4     &       & 4  \\
+		& $\downarrow$ &       & $\downarrow$ & \alert<2->{$\searrow$} &       & \alert<2->{$\searrow$} & \alert<2->{$\downarrow$} \\
+		\textbf{t}     & 5     &       & 4     &       & 4     & \alert<2->{$\rightarrow$} & 5   \\
+	\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}[t] \frametitle{Aufgabe 7.2.2 (AGS) --- Teil (b) \hfill \only<2->{\alert{Lösung}}}
+	Alignments mit minimaler Levenshtein-Distanz zwischen den Wörtern
+	\texttt{bürst} und \texttt{sch}
+	
+	\centering
+	\visible<2->{
+	\begin{tabular}{ccccc}
+		b & ü & r & s & t \\
+		$|$ & $|$ & $|$ & $|$ & $|$ \\
+		s & c & h & $\ast$ & $\ast$ \\
+		\textit{s} & \textit{s} & \textit{s} & \textit{d} & \textit{d}  \\
+	\end{tabular}
+	\hspace{2em}
+	\begin{tabular}{ccccc}
+		b & ü & r & s & t \\
+		$|$ & $|$ & $|$ & $|$ & $|$ \\
+		$\ast$ & $\ast$ & s & c & h \\
+		\textit{d} & \textit{d} & \textit{s} & \textit{s} & \textit{s}  \\
+	\end{tabular}
+	}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,317 @@
+\documentclass{beamer}
+\usepackage{../tut-slides}
+\usepackage{../mathoperatorsAuD}
+
+\usepackage{amsmath,amssymb}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+%\usepackage[inline]{enumitem} 		%customize label
+%\newcommand{\labelitemi}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+%\newcommand{\labelitemii}{$\vartriangleright$}
+%\newcommand{\labelitemiii}{--}
+\setbeamertemplate{itemize item}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subitem}{$\vartriangleright$}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{tabu}
+\newcommand*\head{\rowfont{\bfseries}}
+\newcommand*{\tw}{\rowfont{\ttfamily}}
+\renewcommand{\tabularxcolumn}[1]{>{\hspace{0pt}}m{#1}}
+
+\usepackage{cancel}
+
+\usepackage{empheq}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em} #1 \hspace{2em}}}
+
+\usepackage{tcolorbox}
+\newtcolorbox{mymathbox}[1][]{colback=white, sharp corners, #1}
+
+%%%% EBNF-Terme %%%%
+\newcommand{\wdh}[1]{\hat{\{} \ #1 \ \hat{\}}}
+\newcommand{\opt}[2]{\hat{(} \ #1 \ \hat{|} \ #2 \ \hat{)}}
+\newcommand{\byp}[1]{\hat{[} \ #1 \ \hat{]}}
+\newcommand{\rdb}[1]{\hat{(} \ #1 \ \hat{)}}
+
+\newcommand{\sem}[1]{\left\llbracket #1 \right\rrbracket}
+
+\newcommand*{\ttfamilywithbold}{\fontfamily{lmtt}\selectfont}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{numbers=left, 
+	numberstyle=\tiny, 
+	breaklines=true,
+	numbersep=5pt,
+	language=C,
+	tabsize=2,
+	basicstyle=\normalsize\ttfamilywithbold} 
+
+\lstdefinestyle{example}{
+	basicstyle=\small\ttfamilywithbold,   
+	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                 % sets automatic line breaking
+	commentstyle=\itshape,    	     % comment style
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	backgroundcolor=\color{cdgray!10},
+	keywordstyle=\bfseries,       % keyword style
+	morekeywords={}, 
+	language=C,                 % the language of the code
+	numbers=left,                    % where to put the line-numbers; possible: (none, left, right)
+	numbersep=5pt,                   % how far the line-numbers are from the code
+	numberstyle=\tiny\color{cdgray!50}, % the style that is used for the line-numbers
+	rulecolor=\color{cddarkblue}, 
+	tabsize=2,	                   % sets default tabsize to 2 spaces
+}
+\lstdefinestyle{frame}{
+	basicstyle=\normalsize\ttfamilywithbold,   
+	breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                 % sets automatic line breaking
+	commentstyle=\itshape,    	     % comment style
+	escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+	extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	frame=single,
+	keywordstyle=\bfseries,       % keyword style
+	morekeywords={}, 
+	language=C,                 % the language of the code
+	numbers=left,                    % where to put the line-numbers; possible: (none, left, right)
+	numbersep=5pt,                   % how far the line-numbers are from the code
+	numberstyle=\tiny\color{cdgray!50}, % the style that is used for the line-numbers
+	rulecolor=\color{cddarkblue}, 
+	tabsize=2,	                   % sets default tabsize to 2 spaces
+}
+
+
+\begin{document}	
+	\title{Algorithmen und Datenstrukturen}
+	\subtitle{Übung 4: Programmieren mit $C$}
+	\author{Eric Kunze}
+	\email{eric.kunze@mailbox.tu-dresden.de}
+	\city{TU Dresden}
+%	\institute{Lehrstuhl für Grundlagen der Programmierung}
+	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
+	\date{20.11.2020}
+
+	\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile] \frametitle{C}
+	\begin{itemize}
+		\item Input / Output: \lstinline{#include <stdio.h>}
+		\item Variablentypen: z.B. \lstinline{int}, \lstinline{float}, \lstinline{char}
+		\item arithmetische Operatoren: \lstinline{+}, \lstinline{-},  \lstinline{*}, \lstinline{/}, \lstinline{%}
+		\item Vergleichsoperatoren: \lstinline{==}, \lstinline{<}, \lstinline{<=}, \lstinline{>}, \lstinline{>=}
+		\item Logikoperatoren: 
+		\begin{itemize}
+			\item Negation: \lstinline{!} 
+			\item Konjunktion: \lstinline{&&} 
+			\item Disjunktion: \lstinline{||}
+		\end{itemize}
+		\item Arrays: \lstinline{int feld[7]} (Indizierung beginnend bei 0)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Input \& Output}
+	\begin{itemize}
+		\item Einlesen: \lstinline{scanf("%d", &n);}
+		\item Ausgeben: \lstinline{printf("n!=%d\n", factorial);}
+	\end{itemize}
+
+	weiter Informationen: \\
+	\url{https://www.tutorials.at/c/03-dateneingabe-ausgabe.html}
+			
+			
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile] \frametitle{Bedingungen}
+	\small
+	\begin{itemize}
+		\item \fbox{\texttt{if}-\texttt{else}-Statement:} \\
+		bedingte Ausführung eines Statements
+\begin{lstlisting}[style=example]
+if ( BoolExp ) {
+	Statement ;
+} else  {
+	Statement ;
+}
+\end{lstlisting}
+		\item \fbox{\texttt{switch}-Statement:} \\
+		Fallunterscheidung mit mehr als zwei Fällen
+\begin{lstlisting}[style=example]
+switch ( Exp ) {
+	case 0: StatementSeq ; break ;
+	case 1: StatementSeq ; break ;
+	default: StatementSeq ;
+}
+\end{lstlisting}
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile] \frametitle{Schleifen}
+	\begin{itemize}
+		\item \fbox{\texttt{while}-Statement:} wiederholte Ausführung eines Statements (Schleifenrumpf)
+\begin{lstlisting}[style=example]
+while ( BoolExp ) {
+	Statement ;
+}
+\end{lstlisting}
+		\item \fbox{\texttt{do}-\texttt{while}-Statement:} vergleichbar mit While-Statement, aber Schleifenbedingung wird nach Rumpf geprüft
+\begin{lstlisting}[style=example]
+do {
+	Statement ;
+} while ( BoolExp )
+\end{lstlisting}
+
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile] \frametitle{Schleifen}
+	\begin{itemize}
+		\item \fbox{\texttt{for}-Statement:} vor der Schleife steht Anzahl der Schleifendurchläufe fest
+\begin{lstlisting}[style=example]
+for ( Assignment ; BoolExp ; Assignment ) {
+	Statement ;
+}
+\end{lstlisting}	
+	zum Beispiel:
+\begin{lstlisting}[style=example]
+for (i = 1; i <= n; i = i + 1){
+	printf("i = %d\n", i);
+}
+\end{lstlisting}	
+	\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Übungsblatt 4}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (a)}
+	\textbf{Maximum:} $\displaystyle \max(n,m) = \begin{cases}
+		m & \text{wenn } n < m \\
+		n & \text{sonst}
+	\end{cases}$ \pause
+	
+	\vspace{\baselineskip}
+	
+	\begin{lstlisting}[style=frame, basicstyle=\ttfamilywithbold\footnotesize]
+#include <stdio.h>
+int main() {
+	int x, y, m;
+	scanf("%d", &x);
+	scanf("%d", &y);
+	if ( x < y ) {
+		m = y;
+	} else { // x >= y
+		m = x;
+	}
+	printf("Das Maximum von %d und %d ist %d.\n", x, y, m);
+	return 0;
+}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (b)}
+	\textbf{Fakultät:} $\displaystyle n! = n * (n-1) * (n-2) * \dots * 2 * 1$ \pause
+	
+\begin{lstlisting}[style=frame]
+#include <stdio.h>
+int main(){
+	int n, i, factorial = 1;
+	scanf("%d", &n);
+	for (i = 1; i <= n; i = i + 1){
+		factorial = factorial * i;
+	}
+	printf("n! = %d\n", factorial);
+	return 0;
+}
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (c)}
+	\pause
+	
+	\begin{lstlisting}[style=frame]
+#include <stdio.h>
+int main(){
+	int i,j,n;
+	scanf("%d", &n);
+	for ( i=1; i<=n ; i=i+1 ) {
+		for ( j=1; j<=n ; j=j+1 ) {
+			printf("%4d", i*j);
+		}
+		printf("\n");
+	}
+	return 0;
+}
+	\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (d)}
+	\pause
+	
+	\begin{lstlisting}[style=frame, basicstyle=\ttfamilywithbold\footnotesize]
+#include <stdio.h>
+int main(){
+	for (int i = 2; i <= 1000; i++) {
+		int j = 2, prime = 1;
+		while (j*j <= i) {
+			if (i%j == 0) {
+				prime = 0;
+				break; // nicht notwendig
+			}
+			j++;
+		}
+		if (prime == 1)
+			printf("%d ist prim\n", i);
+	}
+	return 0;
+}
+	\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2}
+	\footnotesize
+	\begin{itemize}
+		\item \textbf{A:} \lstinline|matches > 0|
+		\item \textbf{B:} \lstinline|turn == 1|
+		\item \textbf{C:} 
+		\begin{lstlisting}[basicstyle=\ttfamilywithbold\tiny, numbers=none]
+z = (matches - 1) % 4;
+if (z == 0)
+	z = 1
+matches = matches - z;
+turn = 0;
+		\end{lstlisting}
+	\item \textbf{D:} 
+	\begin{lstlisting}[basicstyle=\ttfamilywithbold\tiny, numbers=none]
+printf("Der Computer zog %d Strichhoelzer;\n", z);
+printf("somit verbleiben %d Streichhoelzer.\n", matches);
+	\end{lstlisting}
+	\item \textbf{E:} 
+	\begin{lstlisting}[basicstyle=\ttfamilywithbold\tiny, numbers=none]
+scanf("%d", &z);
+matches = matches - z;
+turn = 1;
+	\end{lstlisting}
+	\item \textbf{F:}
+	\begin{lstlisting}[basicstyle=\ttfamilywithbold\tiny, numbers=none]
+if (turn == 1)
+	printf("Der Computer gewinnt.");
+else
+	printf("Der Mensch gewinnt.");
+	\end{lstlisting}
+	\end{itemize}
+\end{frame}
+\end{document}
