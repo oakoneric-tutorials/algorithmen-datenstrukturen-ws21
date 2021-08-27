@@ -1,0 +1,195 @@
+\documentclass[border=3pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage[english,ngerman]{babel}
+
+\usepackage[scale=0.95, default]{opensans}
+\usepackage{lmodern}
+% \renewcommand*{\familydefault}{\sfdefault}
+
+
+\usepackage{amsmath,amsfonts,amssymb}
+%\usepackage{mdsymbol}
+\usepackage[cm]{sfmath}
+\usepackage{bm} % \bm{...} for bold math
+
+\usepackage{graphicx,xcolor}
+\usepackage{tudscrcolor}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc, math, positioning}
+\usepackage{pgfplots}
+
+\renewcommand{\vec}[1]{\bm{#1}}
+
+\newcommand{\Sterm}[1]{#1}
+\newcommand{\blank}{_}
+
+\newcommand{\nonterminal}[3]{
+	\node (#1) [rectangle, minimum height=2em, minimum width=2em, draw=black, thick] at #3 {#2};
+}
+
+\newcommand{\nonterminalRel}[3]{
+	\node (#1) [rectangle, minimum height=2em, minimum width=2em, draw=black, thick, #3] {#2};
+}
+
+
+\newcommand{\terminal}[3]{
+	\node (#1) [circle, minimum height=2em, minimum width=2em, draw=black, thick] at #3 {#2};
+}
+\newcommand{\terminalRel}[3]{
+	\node (#1) [circle, minimum height=2em, minimum width=2em, draw=black, thick, #3] {#2};
+}
+
+\newcommand{\terminals}[3]{
+	\node (#1) [rectangle, rounded corners=1.5ex, minimum height=2em, minimum width=2em, draw=black, thick] at #3 {#2};
+}
+
+\newcommand{\altleft}[2]{
+	\path let 
+	\p1 = (#1), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (alt-curve) at (\x1, \y2);
+	%
+	\path let 
+	\p1 = (#1), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (alt-start) at (\x1 - 1em, \y1);
+	%
+%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	
+	\draw[thick, rounded corners=1.5ex] (alt-start) -- (#1) -- (alt-curve) -- (#2.west);
+}
+
+\newcommand{\altright}[2]{
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2) 
+	in 
+	coordinate (alt-curve) at (\x2, \y1);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2) 
+	in 
+	coordinate (alt-end) at (\x2 + 1em, \y2);
+	%	
+	\draw[thick, rounded corners=1.5ex] (#1.east) -- (alt-curve) -- (#2) -- (alt-end);
+}
+
+\newcommand{\loopright}[2]{
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.east) 
+	in 
+	coordinate (loop-start) at (\x1 - 1em, \y1);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (loop-curve) at (\x1, \y2);
+	%
+%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	
+	\draw[thick, rounded corners=1.5ex] (loop-start) -- (#1.east) -- (loop-curve) -- (#2.east);
+}
+
+\newcommand{\loopleft}[2]{
+	\path let 
+	\p1 = (#1.west), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (loop-end) at (\x2 + 1em, \y2);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (loop-curve) at (\x2, \y1);
+	%
+	\draw[thick, rounded corners=1.5ex] (#1.west) -- (loop-curve) -- (#2.west) -- (loop-end);
+}
+
+\begin{document}
+
+    \begin{tikzpicture}
+%        \draw[help lines] (0,0) grid (7,2);
+        
+        
+        
+        \coordinate (S-start) at (-1,2) {};
+        \coordinate (S-end) at (8,2) {};
+        
+        \node () [left=0.5em of S-start] {$S$:};
+        
+        \nonterminal{S-A}{$A$}{(2,2)}
+        \nonterminal{S-B}{$B$}{(5,1)}
+        
+        \draw[thick] (S-start) -- (S-A) -- (S-end);
+        
+        \coordinate (S-B-down) at (6,2);
+        \coordinate (S-B-up) at (4,2);
+		\loopright{S-B-down}{S-B}
+		\loopleft{S-B}{S-B-up}
+		
+		
+		
+		\coordinate (A-start) at (-1,0);
+		\coordinate (A-end) at (8,0);
+		
+		\node () [left=0.5em of A-start] {$A$:};
+        
+        \terminal{A-a}{$a$}{(0,0)}
+        \nonterminal{A-A}{$A$}{(2,0)}
+        \terminal{A-b}{$b$}{(4.5,0)}
+        \terminal{A-c}{$c$}{(5.5,0)}
+        \terminal{A-d}{$d$}{(5,-1)}
+        
+        
+        \draw[thick] (A-start) 
+        	-- (A-a)
+        	-- (A-A) 
+        	-- coordinate [midway] (A-Ab) (A-b)
+        	-- (A-c)
+        	-- coordinate [midway] (A-cend) (A-end);
+        
+        \altleft{A-Ab}{A-d}
+        \altright{A-d}{A-cend}
+        
+        
+        
+       
+        \coordinate (B-start) at (-1,-2); % [below of=A-start] {};
+        \coordinate (B-end) at (8,-2); % [below of=A-end] {};
+        
+        \node () [left=0.5em of B-start] {$B$:};        
+        
+        \nonterminal{B-B}{$B$}{(2,-2)}
+        \terminal{B-b}{$b$}{(5,-2)}
+        
+        \coordinate [below=of B-B] (B-nothing);
+        
+        \draw[thick] (B-start) 
+        	-- coordinate [midway] (B-startB) (B-B)
+        	-- coordinate [midway] (B-Bb) (B-b)
+        	-- (B-end);
+        
+        \altleft{B-startB}{B-nothing}
+        \altright{B-nothing}{B-Bb}
+               
+        
+        
+%        \path[->,line width=0.5mm](A) edge node[above] {$\blank\mapsto\Sterm{a},R$} (q1);
+%        \path[->,line width=0.5mm](q1) edge node[above] {$\blank\mapsto\Sterm{b},N$} (q2);
+%        \path[->,line width=0.5mm](q2) edge[bend left] node[below] {$\Sterm{b}\mapsto\Sterm{a},R$} (A);
+
+    \end{tikzpicture}
+
+\end{document}

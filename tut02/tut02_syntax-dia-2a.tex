@@ -1,0 +1,154 @@
+\documentclass[border=3pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage[english,ngerman]{babel}
+
+\usepackage[scale=0.95, default]{opensans}
+\usepackage{lmodern}
+% \renewcommand*{\familydefault}{\sfdefault}
+
+
+\usepackage{amsmath,amsfonts,amssymb}
+%\usepackage{mdsymbol}
+\usepackage[cm]{sfmath}
+\usepackage{bm} % \bm{...} for bold math
+
+\usepackage{graphicx,xcolor}
+\usepackage{tudscrcolor}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, calc, math, positioning}
+\usepackage{pgfplots}
+
+\renewcommand{\vec}[1]{\bm{#1}}
+
+\newcommand{\Sterm}[1]{#1}
+\newcommand{\blank}{_}
+
+\newcommand{\nonterminal}[3]{
+	\node (#1) [rectangle, minimum height=2em, minimum width=2em, draw=black, thick] at #3 {#2};
+}
+
+\newcommand{\nonterminalRel}[3]{
+	\node (#1) [rectangle, minimum height=2em, minimum width=2em, draw=black, thick, #3] {#2};
+}
+
+
+\newcommand{\terminal}[3]{
+	\node (#1) [circle, minimum height=2em, minimum width=2em, draw=black, thick] at #3 {#2};
+}
+\newcommand{\terminalRel}[3]{
+	\node (#1) [circle, minimum height=2em, minimum width=2em, draw=black, thick, #3] {#2};
+}
+
+\newcommand{\terminals}[3]{
+	\node (#1) [rectangle, rounded corners=1.5ex, minimum height=2em, minimum width=2em, draw=black, thick] at #3 {#2};
+}
+
+\newcommand{\alt}[2]{
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (E-yproj) at (\x1, \y2);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (K-yproj) at (\x2, \y1);
+	%
+	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	
+	\draw[thick, rounded corners=1.5ex] (#1.east) -- (E-mid) -- (K-mid) -- (#2.west);
+}
+
+
+\begin{document}
+
+    \begin{tikzpicture}[baseline={(A-a1.base)},
+    	vloop/.style={to path={-- ++(#1,0) |- (\tikztotarget)}},
+    	hloop/.style={to path={-- ++($(0,0)-(#1,0)$) |- (\tikztotarget)}},
+    	hv path/.style={to path={-| (\tikztotarget)}},
+    	vh path/.style={to path={|- (\tikztotarget)}},
+    ]
+%        \draw[help lines] (0,0) grid (7,2);
+        
+        
+        
+        \coordinate (S-start) at (-1,1) {};
+        \coordinate (S-end) at (8,1) {};
+        
+        \node () [left=0.5em of S-start] {$S$:};
+        
+        \nonterminal{S-A}{$A$}{(2,1)}
+        \nonterminal{S-B}{$B$}{(5,1)}
+        
+        \draw[thick] (S-start) -- (S-A) -- (S-B) -- (S-end);
+
+		
+		
+		
+		\coordinate (A-start) at (-1,0);
+		\coordinate (A-end) at (8,0);
+		
+		\node () [left=0.5em of A-start] {$A$:};
+        
+        \terminal{A-a1}{$a$}{(0,0)}
+        \terminal{A-a2}{$a$}{(1,0)}
+        \nonterminal{A-A}{$A$}{(3,0)}
+        \terminal{A-b1}{$b$}{(5,0)}
+        \terminal{A-b2}{$b$}{(6,0)}
+        \terminal{A-b3}{$b$}{(7,0)}
+        
+        \terminalRel{A-c}{$c$}{below of=A-A}
+        
+        \draw[thick] (A-start) 
+        	-- (A-a1)
+        	-- (A-a2) 
+        	-- node[pos=0.3](A-a2A){} (A-A)
+        	-- node[pos=0.7](A-Ab1){} (A-b1)
+        	-- (A-b2)
+        	-- (A-b3)
+        	-- (A-end);
+        
+        \alt{A-a2}{A-c}
+        \alt{A-c}{A-b1}
+        
+        
+        
+       
+        \coordinate (B-start) at (-1,-2); % [below of=A-start] {};
+        \coordinate (B-end) at (8,-2); % [below of=A-end] {};
+        
+        \node () [left=0.5em of B-start] {$B$:};        
+        
+        \nonterminalRel{B-B}{$B$}{below of=A-c}
+        \terminalRel{B-c}{$c$}{left of=B-B}
+        \terminalRel{B-d1}{$d$}{right of=B-B}
+        \terminalRel{B-d2}{$d$}{right of=B-d1}
+        
+        \terminalRel{B-d}{$d$}{below of=B-B}
+        
+        \draw[thick] (B-start) 
+        	-- node[midway](B--c){} (B-c)
+        	-- (B-B)
+        	-- (B-d1)
+        	-- (B-d2)
+        	-- node[midway](B-d2-){} (B-end);
+        
+        \alt{B-start}{B-d}
+        \alt{B-d}{B-end}
+               
+        
+        
+%        \path[->,line width=0.5mm](A) edge node[above] {$\blank\mapsto\Sterm{a},R$} (q1);
+%        \path[->,line width=0.5mm](q1) edge node[above] {$\blank\mapsto\Sterm{b},N$} (q2);
+%        \path[->,line width=0.5mm](q2) edge[bend left] node[below] {$\Sterm{b}\mapsto\Sterm{a},R$} (A);
+
+    \end{tikzpicture}
+
+\end{document}
