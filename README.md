@@ -1,12 +1,12 @@
 # Übung: Algorithmen & Datenstrukturen
 
-In diesem Repository befinden sich Materialien und Lösungen, die im Rahmen meiner Übungen zur Lehrveranstaltung **Algorithmen und Datenstrukturen** im Wintersemester 2020/21 entstanden sind.
+In diesem Repository befinden sich Materialien und Lösungen, die im Rahmen meiner Übungen zur Lehrveranstaltung **Algorithmen und Datenstrukturen** im Wintersemester 2021/21 entstanden sind.
 
 Diese Lösungen wurden nicht vom Lehrstuhl erstellt und können damit trotz gründlicher Arbeit noch Fehler enthalten. Findet ihr einen solchen, dann fühlt euch eingeladen, diesen mit einem Pull-Request zu beheben.
 
-Bitte beachtet stets die aktuellen Informationen auf der [Website der Lehrveranstaltung](https://www.orchid.inf.tu-dresden.de/teaching/2020ws/aud/) und im [OPAL-Kurs](https://bildungsportal.sachsen.de/opal/auth/RepositoryEntry/26663256067?5).
+Bitte beachtet stets die aktuellen Informationen im [OPAL-Kurs](https://bildungsportal.sachsen.de/opal/auth/RepositoryEntry/32107069456?37).
 
-Bei Fragen oder Problemen könnt ihr euch an [mich](mailto:eric.kunze@mailbox.tu-dresden.de) oder an [Thomas Ruprecht](mailto:thomas.ruprecht@tu-dresden.de) wenden.
+Bei Fragen oder Problemen könnt ihr euch an [mich](mailto:eric.kunze@tu-dresden.de) oder an [Thomas Ruprecht](mailto:thomas.ruprecht@tu-dresden.de) wenden.
 
 Ausführlichere Informationen und eine bessere Darstellung der Inhalte findet ihr auf meiner eigenen [Website](https://oakoneric.github.io).
 
@@ -33,10 +33,9 @@ Weitere Informationen findet ihr auch auf der Lehrveranstaltungswebsite.
 
 ## Weitere Materialien
 * [CheatSheet Linux-Terminal](https://www.cheatography.com/davechild/cheat-sheets/linux-command-line/pdf/)
-* [Offizielle Lehrveranstaltungsevaluation](./Evaluation_UE8AlgorithmenundDatenstrukturen.pdf)
 
 
 
 ## Kontakt
 * Eric Kunze
-* Mail: [eric.kunze@mailbox.tu-dresden.de](eric.kunze@mailbox.tu-dresden.de)
+* Mail: [eric.kunze@tu-dresden.de](eric.kunze@tu-dresden.de)
