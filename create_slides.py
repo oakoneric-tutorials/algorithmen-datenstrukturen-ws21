@@ -21,29 +21,34 @@ tempFilename = filename + "_temp"
 # OPEN AND READ INPUT
 with io.open(path + filename + texExt, mode='r', encoding='UTF8') as file:
     content = file.readlines()
-file.close()
+
 # =============================================================================
 
 # change working directory
 os.chdir(path)
 
-slidesOption  = "\\documentclass{beamer}\n"
+slidesOption = "\\documentclass{beamer}\n"
 handoutOption = "\\documentclass[handout]{beamer}\n"
 
 # =============================================================================
 # HANDOUT
 with io.open(tempFilename + texExt, mode='a', encoding='UTF8') as tempFile:
     tempFile.write(handoutOption)
-    tempFile.writelines(content[1:])
-tempFile.close()
+    for line in content[1:]:
+        tempFile.writelines([line])
+        if '\maketitle' in line:
+            tempFile.writelines(
+                ['\\setbeamercolor{background canvas}{bg=white}\n'])
+
 
 # compile .tex file >> .pdf
-shellHandout = '> texfot pdflatex -jobname=' + handoutFilename + " " + tempFilename + texExt
+shellHandout = '> texfot pdflatex -jobname=' + \
+    handoutFilename + " " + tempFilename + texExt
 os.system(shellHandout)
 os.system(shellHandout)
 
 # remove temporary files (especially .tex-file)
-vrbFile = open(handoutFilename + '.vrb',"w+")
+vrbFile = open(handoutFilename + '.vrb', "w+")
 vrbFile.close()
 os.remove(handoutFilename + '.aux')
 os.remove(handoutFilename + '.log')
@@ -61,16 +66,17 @@ os.remove(tempFilename + texExt)
 with io.open(tempFilename + texExt, mode='a', encoding='UTF8') as tempFile:
     tempFile.write(slidesOption)
     tempFile.writelines(content[1:])
-    
+
 tempFile.close()
 
 # compile .tex file >> .pdf
-shellSlides = '> texfot pdflatex -jobname=' + slidesFilename + " " + tempFilename + texExt
+shellSlides = '> texfot pdflatex -jobname=' + \
+    slidesFilename + " " + tempFilename + texExt
 os.system(shellSlides)
 os.system(shellSlides)
 
 # remove temporary files (especially .tex-file)
-vrbFile = open(slidesFilename + '.vrb',"w+")
+vrbFile = open(slidesFilename + '.vrb', "w+")
 vrbFile.close()
 os.remove(slidesFilename + '.aux')
 os.remove(slidesFilename + '.log')
