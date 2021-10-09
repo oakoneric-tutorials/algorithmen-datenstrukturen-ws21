@@ -23,56 +23,54 @@
 	\title{Algorithmen und Datenstrukturen}
 	\subtitle{Übung 1: Einleitung}
 	\author{Eric Kunze}
-	\email{eric.kunze@mailbox.tu-dresden.de}
+	\email{eric.kunze@tu-dresden.de}
 	\city{TU Dresden}
 	\date{30. Oktober 2020}
-%	\institute{Lehrstuhl für Grundlagen der Programmierung}
+	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
 
 	\maketitle
 	
 	\begin{frame} \frametitle{Wer bin ich?}
 		\begin{minipage}{\dimexpr0.75\linewidth-\fboxrule-\fboxsep}
+			\flushleft
 			\begin{itemize}
-				\item \uline{Eric} [Kunze]
-				\item \url{eric.kunze@mailbox.tu-dresden.de}
+				\item \textbf{Eric} \textcolor{cdgray!50}{Kunze}
+				\item \url{eric.kunze@tu-dresden.de}
 				\item Fragen, Wünsche, Vorschläge, \dots 
+				\item \textbf{Telegram:} \\ 
+				\texttt{@oakoneric} bzw. \url{t.me/oakoneric}
 			\end{itemize}
 		\end{minipage}
 		\begin{minipage}{\dimexpr0.25\linewidth-\fboxrule-\fboxsep}
 			\includegraphics[width=3cm]{./tut01_pic.jpg}
 		\end{minipage}		
-		
-		\begin{itemize}
-			\item \textbf{Telegram:} \texttt{@oakoneric} bzw. \url{t.me/oakoneric}
-		\end{itemize}
 	\end{frame}
 
-	\begin{frame}\frametitle{Infos \& Co}
-		\textbf{Lehrveranstaltungswebsite}: \\
-		{\small \url{https://www.orchid.inf.tu-dresden.de/teaching/2020ws/aud/} \\
-			(Google: ''aud tu dresden``)}
-		
+	\begin{frame}\frametitle{Infos \& Co}		
 		\textbf{OPAL-Kurs}: \\
-		{\small \url{https://bildungsportal.sachsen.de/opal/auth/RepositoryEntry/26663256067?5}}
+		{\small \url{https://bildungsportal.sachsen.de/opal/auth/RepositoryEntry/32107069456}}
 		
 		\begin{itemize}
 			\item alle Informationen zur Lehrveranstaltung
-			\item aktuelles Übungsblatt
-			\item Link zu Lösungsvorschlägen
-			\item Übungsverlegungen
+			\item Vorlesungsvideos
+			\item Übungsblätter
+			\item Forum
 		\end{itemize}
 		
-		\textbf{Skript \& Aufgabensammlung}: Copyshop ''Die Kopie``
+		\textbf{Materialien}: 
+		\begin{itemize}
+			\item Slides der Vorlesung (ersetzen ehemaliges Skript)
+			\item Aufgabensammlung
+		\end{itemize}
 	\end{frame}
 
 	\begin{frame} \frametitle{Corona \& Co.}
-		\textbf{Online-Lehre}
+		\textbf{Hybridlehre}
 		\begin{itemize}
-			\item Vorlesung als Video \textbf{freitags} im OPAL-Kurs
-			\item Übungsblatt \textbf{freitags} im OPAL-Kurs (und zeitnah auf meiner Website)
-			\item digitale Übungsbesprechung: Freitag, 2.DS (ausgewählte Aufgaben)
-			\item Korrektur von Aufgaben (nur ohne Präsenzübung)
+			\item Vorlesung als Video \textit{freitags} im OPAL-Kurs
+			\item Übungsblatt \textit{freitags} im OPAL-Kurs (und zeitnah auf meiner Website)
+			\item digitale Übungsbesprechung: Freitag, 2.DS
 		\end{itemize}
 	
 		\textbf{Corona-Regelungen} {\tiny \itshape ohne Garantie -- Eigenverantwortlichkeit}
@@ -80,79 +78,51 @@
 			\item Präsenzübung einschreibungspflichtig
 			\item Nicht-Erscheinen ohne Ankündigung $=$ Austragung
 			\item Wartelisteplätze rutschen nach
-			\item \textbf{Abmeldung} bei Verhinderung !!!
+			\item \alert{\textbf{Abmeldung} bei Verhinderung}
 			\item Teilnahmeliste
-			\item Maskenpflicht abseits des Platzes, Lüften, \dots
+			\item Maskenpflicht bis zum Platz, Lüften, \dots
 		\end{itemize}
-	
-		
 	\end{frame}
 
-	\begin{frame} \frametitle{Vorlesung vs. Übung}
-		\centering
-		\textbf{Was ist eine Übung?}
+	\begin{frame} \frametitle{Meine Materialien}
+		Meine Materialien sind auf meiner Website \url{https://oakoneric.github.io} zu finden.
+		\begin{itemize}
+			\item Slides (mit Lösungen)
+			\item evtl. zusätzliche Materialien (nach Bedarf)
+			\item \alert{\textbf{kein Anspruch auf Vollständigkeit \& Korrektheit}}
+		\end{itemize}
+	
+		Source Code auf Github
+		\url{https://github.com/oakoneric-tutorials/algorithmen-datenstrukturen-ws21}
 		
-		''Lehrveranstaltung an der Hochschule, in der etw., bes. das Anwenden von Grundkenntnissen, von den Studierenden geübt wird`` [Duden]
-		
-		\pause
-		
-		\begin{tabularx}{\linewidth}{X|X}
-			\hline
-			\textbf{Vorlesung} & \textbf{Übung} \\ \hline \hline
-			Vermittlung von neuem Wissen & Üben und Festigen des Stoffes der VL \\ \hline
-			hohes Tempo & (selbst definierbares) langsameres Tempo \\ \hline
-			wenig Interaktion & (sehr) viel Interaktion \\ \hline
-			$\approx 50\%$ Verständnis & $>80\%$ Verständnis \\
-			\hline
-		\end{tabularx}
+		\begin{itemize}
+			\item Fehler gern selbst beheben oder mir Bescheid geben
+		\end{itemize}
 	\end{frame}
 
 	\begin{frame} \frametitle{Was wird in der Übung erwartet?}
-		\begin{center}
-			\bfseries
-			Es wird keine reine Vorrechenübung werden!
-		\end{center}
+		\textbf{Ziel:} viel Interaktivität
 		
-		\pause
-		
-		\begin{block}{Mein Input}
-			\begin{itemize}[leftmargin=2em, nolistsep]
-				\item Zusammenfassung einiger Vorlesungsinhalte
-				\item beispielhafte Lösungsansätze und Lösungen
-				\item Fragen, Fragen, Fragen
-			\end{itemize}
-		\end{block}
-	
-		\pause
-			%
-		\begin{block}{Euer Input}
-			\begin{itemize}[leftmargin=2em, nolistsep]
-				\item Grundverständnis aus der Vorlesung
-				\item Vorbereitung der Übungsaufgaben
-				\item aktive Mitarbeit und FRAGEN
-			\end{itemize}
-		\end{block}
-	\end{frame}
-
-	\begin{frame} \frametitle{Lösungen}
-		\textbf{Slides werden mit Sourcecode auf Github zur Verfügung stehen.}
-		\begin{itemize}[leftmargin=*]
-			\item \url{https://github.com/oakoneric/algorithmen-datenstrukturen-ws20}
-			\item \url{github.com} $\to$ oakoneric $\to$ algorithmen-datenstrukturen-ws20
-		\end{itemize}
-	\textbf{\dots und auf meiner Website:} \url{https://oakoneric.github.io}
+		\textbf{Mein Input}
 		\begin{itemize}
-			\item evtl. zusätzliche Materialien (nach Bedarf)
-			\item \alert{\textbf{kein Anspruch auf Vollständigkeit \& Korrektheit}}
-			\item gefundene Fehler melden
+			\item Zusammenfassung einiger Vorlesungsinhalte
+			\item beispielhafte Lösungsansätze und Lösungen
+			\item Fragen, Fragen, Fragen
+		\end{itemize}
+		
+		\pause
+		
+		\textbf{Euer Input}
+		\begin{itemize}
+			\item Grundverständnis aus der Vorlesung
+			\item Vorbereitung der Übungsaufgaben
+			\item aktive Mitarbeit und Fragen
 		\end{itemize}
 	\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Übungsblatt 1}
-
-
 
 \begin{frame} \frametitle{Aufgabe 1}
 	\renewcommand*{\arraystretch}{1.1}
