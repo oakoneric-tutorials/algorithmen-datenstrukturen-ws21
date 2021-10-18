@@ -1,0 +1,70 @@
+\documentclass[border=3pt]{article}
+\usepackage{parskip}
+\usepackage{../syntaxdiagrammEBNF}
+
+\begin{document}
+	
+		\section*{Übersetzung von EBNF-Termen in Syntaxdiagramme}
+	
+		Sei $v \in V$.   
+		$trans(v) = \tikz[baseline=-0.5ex]{\coordinate (start) at (0,0); \coordinate (end) at (2,0); \nonterminal{v}{$v$}{(1,0)}; \draw[thick] (start) -- (v) -- (end);}$
+		
+		Sei $w \in \Sigma$. $trans(w) =  \tikz[baseline=-0.5ex]{\coordinate (start) at (0,0); \coordinate (end) at (2,0); \terminal{w}{$w$}{(1,0)}; \draw[thick] (start) -- (w) -- (end);}$
+		
+		Sei $\alpha \in T(\Sigma, V)$ ein EBNF-Term. 
+		\begin{itemize}	
+			\item \makebox[2.3cm][l]{$trans(\ \wdh{\alpha} \ )$} $=$  
+			\tikz[baseline=-0.5ex]{
+				\coordinate (start) at (0,0); 
+				\coordinate (end) at (4,0);
+				\coordinate (mid) at (2,0); \terminals{alpha}{$trans(\alpha)$}{(2,-1)}; 
+				\draw[thick] (start) 
+					-- coordinate[pos=0.3](l-start) (mid)
+					-- coordinate[pos=0.7](l-end) (end);
+				\loopleft{alpha}{l-start} 
+				\loopright{l-end}{alpha}
+			}
+			%
+			\item \makebox[2.3cm][l]{$trans(\ \byp{\alpha} \ )$} $=$  
+			\tikz[baseline=-0.5ex]{
+				\coordinate (start) at (0,0); 
+				\coordinate (end) at (4,0);
+				\coordinate (lower) at (2,-1); \terminals{alpha}{$trans(\alpha)$}{(2,0)}; 
+				\draw[thick] (start) 
+				-- coordinate[midway](l-start) (alpha)
+				-- coordinate[midway](l-end) (end);
+				\altleft{l-start}{lower}
+				\altright{lower}{l-end}
+			}
+			%
+			\item $trans(\ \rdb{\alpha} \ ) = trans(\alpha)$
+		\end{itemize}
+	
+		Seien $\alpha_1, \alpha_2 \in T(\Sigma, V)$ zwei EBNF-Terme. 
+		\begin{itemize}	
+			\item $trans(\ \alpha_1 \alpha_2 \ ) =$  
+			\tikz[baseline=-0.5ex]{
+				\coordinate (start) at (0,0); 
+				\coordinate (end) at (6,0); \terminals{alpha1}{$trans(\alpha_1)$}{(2,0)}; 
+				\terminals{alpha2}{$trans(\alpha_2)$}{(4,0)}; 
+				\draw[thick] (start) 
+				-- (alpha1)
+				-- (alpha2)
+				-- (end);
+			}
+			%
+			\item $trans(\ \opt{\alpha_1}{\alpha_2} \ ) =$  
+			\tikz[baseline=-0.5ex]{
+				\coordinate (start) at (0,0); 
+				\coordinate (end) at (4,0); \terminals{alpha1}{$trans(\alpha_1)$}{(2,0)}; 
+				\terminals{alpha2}{$trans(\alpha_2)$}{(2,-1)}; 
+				\draw[thick] (start) 
+				-- coordinate[midway](l-start) (alpha1)
+				-- coordinate[midway](l-end) (end);
+				\altleft{l-start}{alpha2}
+				\altright{alpha2}{l-end}
+			}
+		\end{itemize}
+
+
+\end{document}
