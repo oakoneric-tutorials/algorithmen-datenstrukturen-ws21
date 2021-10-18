@@ -1,0 +1,101 @@
+\ProvidesPackage{syntaxdiagramm}
+
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta, calc, math, positioning}
+
+\newcommand{\nonterminal}[3]{
+	\node (#1) [rectangle, minimum height=2em, minimum width=2em, draw, thick] at #3 {#2};
+}
+
+\newcommand{\nonterminalRel}[3]{
+	\node (#1) [rectangle, minimum height=2em, minimum width=2em, draw, thick, #3] {#2};
+}
+
+
+\newcommand{\terminal}[3]{
+	\node (#1) [circle, minimum height=2em, minimum width=2em, draw, thick] at #3 {#2};
+}
+\newcommand{\terminalRel}[3]{
+	\node (#1) [circle, minimum height=2em, minimum width=2em, draw, thick, #3] {#2};
+}
+
+\newcommand{\terminals}[3]{
+	\node (#1) [rectangle, rounded corners=1.5ex, minimum height=2em, minimum width=2em, draw, thick] at #3 {#2};
+}
+
+
+\newcommand{\altleft}[2]{
+	\path let 
+	\p1 = (#1), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (alt-curve) at (\x1, \y2);
+	%
+	\path let 
+	\p1 = (#1), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (alt-start) at (\x1 - 1em, \y1);
+	%
+	%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+	%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	
+	\draw[thick, rounded corners=1.5ex] (alt-start) -- (#1) -- (alt-curve) -- (#2.west);
+}
+
+\newcommand{\altright}[2]{
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2) 
+	in 
+	coordinate (alt-curve) at (\x2, \y1);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2) 
+	in 
+	coordinate (alt-end) at (\x2 + 1em, \y2);
+	%	
+	\draw[thick, rounded corners=1.5ex] (#1.east) -- (alt-curve) -- (#2) -- (alt-end);
+}
+
+\newcommand{\loopright}[2]{
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.east) 
+	in 
+	coordinate (loop-start) at (\x1 - 1em, \y1);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (loop-curve) at (\x1, \y2);
+	%
+	%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+	%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	
+	\draw[thick, rounded corners=1.5ex] (loop-start) -- (#1.east) -- (loop-curve) -- (#2.east);
+}
+
+\newcommand{\loopleft}[2]{
+	\path let 
+	\p1 = (#1.west), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (loop-end) at (\x2 + 1em, \y2);
+	%
+	\path let 
+	\p1 = (#1.east), 
+	\p2 = (#2.west) 
+	in 
+	coordinate (loop-curve) at (\x2, \y1);
+	%
+	\draw[thick, rounded corners=1.5ex] (#1.west) -- (loop-curve) -- (#2.west) -- (loop-end);
+}
+
+%%%% EBNF-Terme %%%%
+\newcommand{\wdh}[1]{\hat{\{} \ #1 \ \hat{\}}}
+\newcommand{\opt}[2]{\hat{(} \ #1 \ \hat{|} \ #2 \ \hat{)}}
+\newcommand{\byp}[1]{\hat{[} \ #1 \ \hat{]}}
+\newcommand{\rdb}[1]{\hat{(} \ #1 \ \hat{)}}
