@@ -60,8 +60,8 @@
 	in 
 	coordinate (alt-start) at (\x1 - 1em, \y1);
 	%
-%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
-%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+	%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
 	%	
 	\draw[thick, rounded corners=1.5ex] (alt-start) -- (#1) -- (alt-curve) -- (#2.west);
 }
@@ -95,8 +95,8 @@
 	in 
 	coordinate (loop-curve) at (\x1, \y2);
 	%
-%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
-%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
+	%	\path (#1.east) -- coordinate[midway] (E-mid) (K-yproj);
+	%	\path (E-yproj) -- coordinate[midway] (K-mid) (#2.west);
 	%	
 	\draw[thick, rounded corners=1.5ex] (loop-start) -- (#1.east) -- (loop-curve) -- (#2.east);
 }
@@ -117,78 +117,60 @@
 	\draw[thick, rounded corners=1.5ex] (#1.west) -- (loop-curve) -- (#2.west) -- (loop-end);
 }
 
+
 \begin{document}
 
-    \begin{tikzpicture}
+    \begin{tikzpicture}[baseline={(S-a.base)},
+    	vloop/.style={to path={-- ++(#1,0) |- (\tikztotarget)}},
+    	hloop/.style={to path={-- ++($(0,0)-(#1,0)$) |- (\tikztotarget)}},
+    	hv path/.style={to path={-| (\tikztotarget)}},
+    	vh path/.style={to path={|- (\tikztotarget)}},
+    ]
 %        \draw[help lines] (0,0) grid (7,2);
         
         
         
-        \coordinate (S-start) at (-1,2) {};
-        \coordinate (S-end) at (8,2) {};
+        \coordinate (S-start) at (-1,1) {};
+        \coordinate (S-end) at (5,1) {};
         
         \node () [left=0.5em of S-start] {$S$:};
         
-        \nonterminal{S-A}{$A$}{(2,2)}
-        \nonterminal{S-B}{$B$}{(5,1)}
+        \terminal{S-a}{$a$}{(0,1)}
+        \nonterminal{S-B}{$B$}{(2,1)}
+        \terminal{S-b}{$b$}{(4,1)}
         
-        \draw[thick] (S-start) -- (S-A) -- (S-end);
+        \terminal{S-c1}{$c$}{(1.5,0)}
+        \terminal{S-c2}{$c$}{(2.5,0)}
         
-        \coordinate (S-B-down) at (6,2);
-        \coordinate (S-B-up) at (4,2);
-		\loopright{S-B-down}{S-B}
-		\loopleft{S-B}{S-B-up}
+        \draw[thick] (S-start) 
+        	-- (S-a) 
+        	-- coordinate[pos=0.3](S-aB) (S-B) 
+        	-- coordinate[pos=0.7](S-Bb) (S-b) 
+        	-- (S-end);
+
+		\altleft{S-aB}{S-c1}
+		\draw[thick] (S-c1) -- (S-c2);
+		\altright{S-c2}{S-Bb}
 		
 		
+		\coordinate (B-start) at (-1,-1);
+		\coordinate (B-end) at (5,-1);
 		
-		\coordinate (A-start) at (-1,0);
-		\coordinate (A-end) at (8,0);
-		
-		\node () [left=0.5em of A-start] {$A$:};
+		\node () [left=0.5em of B-start] {$B$:};
         
-        \terminal{A-a}{$a$}{(0,0)}
-        \nonterminal{A-A}{$A$}{(2,0)}
-        \terminal{A-b}{$b$}{(4.5,0)}
-        \terminal{A-c}{$c$}{(5.5,0)}
-        \terminal{A-d}{$d$}{(5,-1)}
-        
-        
-        \draw[thick] (A-start) 
-        	-- (A-a)
-        	-- (A-A) 
-        	-- coordinate [midway] (A-Ab) (A-b)
-        	-- (A-c)
-        	-- coordinate [midway] (A-cend) (A-end);
-        
-        \altleft{A-Ab}{A-d}
-        \altright{A-d}{A-cend}
-        
-        
-        
-       
-        \coordinate (B-start) at (-1,-2); % [below of=A-start] {};
-        \coordinate (B-end) at (8,-2); % [below of=A-end] {};
-        
-        \node () [left=0.5em of B-start] {$B$:};        
-        
-        \nonterminal{B-B}{$B$}{(2,-2)}
-        \terminal{B-b}{$b$}{(5,-2)}
-        
-        \coordinate [below=of B-B] (B-nothing);
-        
+        \terminal{B-a}{$a$}{(1,-1)}
+        \nonterminal{B-B}{$B$}{(2,-1)}
+        \terminal{B-d}{$d$}{(3,-1)}
+        \nonterminal{B-S}{$S$}{(2,-2)}
+         
         \draw[thick] (B-start) 
-        	-- coordinate [midway] (B-startB) (B-B)
-        	-- coordinate [midway] (B-Bb) (B-b)
-        	-- (B-end);
+        	-- coordinate[midway](B-starta) (B-a)
+        	-- (B-B)
+        	-- (B-d)
+        	-- coordinate[midway](B-dend) (B-end);
         
-        \altleft{B-startB}{B-nothing}
-        \altright{B-nothing}{B-Bb}
-               
-        
-        
-%        \path[->,line width=0.5mm](A) edge node[above] {$\blank\mapsto\Sterm{a},R$} (q1);
-%        \path[->,line width=0.5mm](q1) edge node[above] {$\blank\mapsto\Sterm{b},N$} (q2);
-%        \path[->,line width=0.5mm](q2) edge[bend left] node[below] {$\Sterm{b}\mapsto\Sterm{a},R$} (A);
+		\altleft{B-starta}{B-S}
+		\altright{B-S}{B-dend}
 
     \end{tikzpicture}
 
