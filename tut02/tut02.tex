@@ -94,7 +94,7 @@
 	\small
 	
 	\begin{minipage}[t]{\dimexpr0.55\linewidth-\fboxrule-\fboxsep}
-		Gegeben sei das folgende Syntaxdiagrammsystem $\mathcal{U}$ mit Startdiagramm $S$:
+		Gegeben sei das folgende Syntax\-diagrammsystem $\mathcal{U}$ mit Startdiagramm $S$:
 		
 		\vspace{2em}
 		
@@ -200,16 +200,23 @@
 	\small
 	\begin{itemize}
 		\item EBNF-Definition besteht aus endlicher Menge von EBNF-Regeln.
+		\begin{equation*}
+			\mathcal{E} = (V, \Sigma, S, R)
+		\end{equation*}
 		\item Jede EBNF-Regel besteht aus einer linken und einer rechten Seite, die rechte Seite ist ein EBNF-Term.
+		\begin{equation*}
+			left ::= EBNFTerm
+		\end{equation*}
 	\end{itemize}
+	
 	\pause
-	\begin{block}{Definition: EBNF-Term}
-		Seien $V$ eine endliche Menge (syntaktische Variablen) und $\Sigma$ eine endliche Menge (Terminalsymbole) mit $V \cap \Sigma = \emptyset$. Die Menge der EBNF-Terme über $V$ und $\Sigma$ (notiere: $T(\Sigma, V)$), ist die \emph{kleinste} Menge $T \subseteq \brackets{V \cup \Sigma \cup \menge{\hat{\{}, \hat{\}}, \hat{[}, \hat{]}, \hat{(}, \hat{)}, \hat{|}}}$ mit $V \subseteq T$, $\Sigma \subseteq T$ und
-		\begin{itemize}
-			\item Wenn $\alpha \in T$, so auch $\rdb{\alpha} \in T$, $\wdh{\alpha} \in T$, $\byp{\alpha} \in T$.
-			\item Wenn $\alpha_1, \alpha_2 \in T$, so auch $\opt{\alpha_1}{\alpha_2} \in T$, $\alpha_1 \alpha_2 \in T$
-		\end{itemize}
-	\end{block}
+	
+	\textbf{Definition (EBNF-Terme)}:	
+	Seien $V$ (syntaktische Variablen) und $\Sigma$ (Terminalsymbole) endliche Mengen mit $V \cap \Sigma = \emptyset$. Die Menge der EBNF-Terme über $V$ und $\Sigma$ (notiere: $T(\Sigma, V)$), ist die \emph{kleinste} Menge $T \subseteq \brackets{V \cup \Sigma \cup \menge{\hat{\{}, \hat{\}}, \hat{[}, \hat{]}, \hat{(}, \hat{)}, \hat{|}}}$ mit $V \subseteq T$, $\Sigma \subseteq T$ und
+	\begin{itemize}
+		\item Wenn $\alpha \in T$, so auch $\rdb{\alpha} \in T$, $\wdh{\alpha} \in T$, $\byp{\alpha} \in T$.
+		\item Wenn $\alpha_1, \alpha_2 \in T$, so auch $\opt{\alpha_1}{\alpha_2} \in T$, $\alpha_1 \alpha_2 \in T$.
+	\end{itemize}
 \end{frame}
 
 \begin{frame} \frametitle{Übersetzung EBNF $\leftrightarrow$ Syntaxdiagramme}
@@ -291,14 +298,14 @@
 
 \begin{frame} \frametitle{Aufgabe 2 --- Teil (a)}
 	\small
-	EBNF-Definition $\mathcal{E} = (V,\Sigma,S,R)$ mit $\Sigma = \menge{a,b,c,d}$,
+	EBNF-Definition $\mathcal{E} = (V,\Sigma,A,R)$ mit $\Sigma = \menge{a,b,c,d}$,
 	\begin{align*}
-		V = \menge{S,A,B} 
+		V = \menge{A,B,C} 
 		\quad \und \quad
-		R = \Big\{ S &::= A \ \wdh{B} , \\ 
-				   A &::= aA \  \opt{bc}{d} , \\
-				   B &::= \byp{B} \ b 
-		    \qquad \Big\}
+		R = \Big\{ A &::= BC , \\ 
+				   B &::= \opt{aBc}{\wdh{b}} , \\
+				   C &::= d \ \byp{C} \ c 
+		    \qquad\quad \Big\}
 	\end{align*}
 
 	\pause
@@ -306,26 +313,55 @@
 	\textbf{Übersetzung in ein Syntaxdiagrammsystem:}
 	
 	\centering
-	\includegraphics[height=4.5cm]{tut02_syntax-dia-2a.pdf}
+	\includegraphics[height=3.5cm]{tut02_syntax-dia-2a.pdf}
+	
+	Startdiagramm: $A$
 \end{frame}
 
 \begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
+	Wir wollen die von $\mathcal{E}$ beschriebene Sprache $L_A$ beschreiben und wenden dafür die Grundkonstruktionen \enquote{rückwärts} an. \pause
+	\begin{align*}
+		L_A &= L_B \cdot L_C \\
+		&= \menge{ a^n \ w \ c^n : w \in \menge{b}^\ast : n \ge 0} \cdot \menge{d^m c^m : m \ge 1}
+	\end{align*}
+	
+	Der Teil $w \in \menge{b}^\ast$ beschreibt dabei, dass wir ein beliebiges Wort aus $\menge{b}^\ast$ schreiben. Diese Sprache $\menge{b}^\ast$ wird durch 
+	\begin{center}
+		\tikz[baseline=-0.5ex]{
+			\coordinate (start) at (0,0); 
+			\coordinate (end) at (4,0);
+			\coordinate (mid) at (2,0); 
+			\terminal{b}{$b$}{(2,-1)}; 
+			\draw[thick] (start) 
+			-- coordinate[pos=0.3](l-start) (mid)
+			-- coordinate[pos=0.7](l-end) (end);
+			\loopleft{b}{l-start} 
+			\loopright{l-end}{b}
+		}
+	\end{center}
+	beschrieben.
+
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (c)}
 	Gegeben sei die Sprache
 	\begin{equation*}
-		L = \menge{(ab)^n c^{m+1} d^k b^{n+m} : n,m \ge 0, k \ge 1}
+		L = \menge{ a^{n + \ell} c b^n (cd)^{\ell} : n,\ell \in \N, n \ge 1}
 	\end{equation*}
 	Gesucht ist eine zugehörige EBNF-Definition. \pause
 	\begin{equation*}
-		L = \menge{\textcolor{cdorange}{(ab)^n} \textcolor{cdpurple}{c^{m+1}} d^k \textcolor{cdpurple}{b^m} \textcolor{cdorange}{b^n} : n,m \ge 0, k \ge 1}
+		L = \menge{\purple{a^\ell} \orange{a^n} c \orange{b^n} \purple{(cd)^\ell} : n,\ell \in \N, n \ge 1}
 	\end{equation*}
-	\pause 
 	
-	\textbf{EBNF-Definition:} $\mathcal{E} = (V,\Sigma,S,R)$ mit $\Sigma = \menge{a,b,c,d}$, 
+	\pause 
+	\textbf{Lösungsweg:} via Syntaxdiagrammsystem \& Übersetzung 
+	
+	\textbf{EBNF-Definition:} $\mathcal{E}' = (V,\Sigma,S,R)$ mit $\Sigma = \menge{a,b,c,d}$, 
 	\begin{align*}
 		V = \menge{S,A} \quad \und \quad
 		R = \Big\{ 
-			S &::= \opt{abSb}{A}, \\
-			A &::= \opt{cAb}{cd \ \wdh{d}} \enskip 
+			S &::= \opt{ \purple{a} S \purple{cd}}{A}, \\
+			A &::= \orange{a} \ \opt{A}{c} \ \orange{b} \enskip 
 		\Big\}
 	\end{align*}
 \end{frame}
