@@ -39,7 +39,7 @@
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{06.11.2020}
+	\date{\today}
 
 	\maketitle
 
@@ -90,7 +90,7 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1}
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
 	\small
 	
 	\begin{minipage}[t]{\dimexpr0.55\linewidth-\fboxrule-\fboxsep}
@@ -196,18 +196,47 @@
 
 \section{Extended Backus-Naur-Form}
 
+\tikzstyle{every picture}+=[remember picture]
+
 \begin{frame} \frametitle{EBNF-Definition}
+
+	\begin{center}
+		\begin{tikzpicture}
+			\node[baseline] (E) at (0,0) {$\mathcal{E}$}; 
+			\node[baseline, right=1pt of E, inner sep=1pt] (eq) {$=$};
+			\node[baseline, right=1pt of eq, inner sep=1pt] (ob) {$($}; 
+			\node[right=2pt of ob, inner sep=1pt] (V) {$V,$}; 
+			\node[right=2pt of V, inner sep=1pt] (Sigma) {$\Sigma,$}; 
+			\node[right=2pt of Sigma, inner sep=1pt] (S) {$S,$}; 
+			\node[right=2pt of S, inner sep=1pt] (R) {$R\phantom{,}\hspace{-3pt}$};
+			\node[right=2pt of R, inner sep=1pt] {$)$};
+			
+			\node[align=right, below left=1mm and 1cm of V] (VText)
+			{\scriptsize Nichtterminalsymbole};
+			\path[->, bend right=15]  (VText.east) edge (V.south);
+			
+			\node[align=right, below left=7mm and 0mm of Sigma] (SigmaText)
+			{\scriptsize Terminalsymbole};
+			\path[->, bend right=15]  (SigmaText.north east) edge (Sigma.south);
+			
+			\node[align=left, below right=7mm and 0mm of S] (SText)
+			{\scriptsize Startsymbol};
+			\path[->, bend left=15]  (SText.north west) edge (S.south);
+			
+			\node[align=left, below right=1mm and 1cm of R] (RText)
+			{\scriptsize Regelmenge};
+			\path[->, bend left=15]  (RText.west) edge (R.south);
+			
+			
+		\end{tikzpicture}
+	\end{center}
+	
 	\small
-	\begin{itemize}
-		\item EBNF-Definition besteht aus endlicher Menge von EBNF-Regeln.
-		\begin{equation*}
-			\mathcal{E} = (V, \Sigma, S, R)
-		\end{equation*}
-		\item Jede EBNF-Regel besteht aus einer linken und einer rechten Seite, die rechte Seite ist ein EBNF-Term.
-		\begin{equation*}
-			left ::= EBNFTerm
-		\end{equation*}
-	\end{itemize}
+	
+	Jede \textbf{EBNF-Regel} besteht aus einer linken und einer rechten Seite, die rechte Seite ist ein \textbf{EBNF-Term}.
+	\begin{equation*}
+		\text{\textit{Nichtterminalsymbol}} ::= \text{\textit{EBNF-Term}}
+	\end{equation*}
 	
 	\pause
 	
@@ -322,10 +351,10 @@
 	Wir wollen die von $\mathcal{E}$ beschriebene Sprache $L_A$ beschreiben und wenden dafür die Grundkonstruktionen \enquote{rückwärts} an. \pause
 	\begin{align*}
 		L_A &= L_B \cdot L_C \\
-		&= \menge{ a^n \ w \ c^n : w \in \menge{b}^\ast : n \ge 0} \cdot \menge{d^m c^m : m \ge 1}
+		&= \menge{ a^n \ w \ c^n : w \in \menge{b}^\ast, n \ge 0} \cdot \menge{d^m c^m : m \ge 1}
 	\end{align*}
 	
-	Der Teil $w \in \menge{b}^\ast$ beschreibt dabei, dass wir ein beliebiges Wort aus $\menge{b}^\ast$ schreiben. Diese Sprache $\menge{b}^\ast$ wird durch 
+	Der Teil $w \in \menge{b}^\ast$ beschreibt dabei, dass wir ein beliebiges Wort $w$ aus $\menge{b}^\ast$ zwischen die $a$'s und $c$'s schreiben. Diese Sprache $\menge{b}^\ast$ wird durch 
 	\begin{center}
 		\tikz[baseline=-0.5ex]{
 			\coordinate (start) at (0,0); 
