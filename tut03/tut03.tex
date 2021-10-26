@@ -24,7 +24,7 @@
 
 %%%% EBNF-Terme %%%%
 \usepackage{../syntaxdiagrammEBNF}
-\newcommand{\sem}[1]{\left\llbracket #1 \right\rrbracket}
+
 
 %%%% FARBEN %%%%%
 \newcommand{\orange}[1]{\textcolor{cdorange}{#1}}
@@ -36,11 +36,11 @@
 	\title{Algorithmen und Datenstrukturen}
 	\subtitle{Übung 3: Extended Backus-Naur-Form}
 	\author{Eric Kunze}
-	\email{eric.kunze@mailbox.tu-dresden.de}
+	\email{eric.kunze@tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{13.11.2020}
+	\date{\today}
 
 	\maketitle
 
@@ -226,16 +226,25 @@
 	\end{itemize}
 
 	\pause
-	\textbf{Beobachtung:} $x_{i}$ nähert sich der Nullstelle $\quer{x}$ an
 	
-	\pause
-	Ein \textit{Fixpunkt} von $\Phi$ ist ein Punkt $x$ mit $\Phi(x) = x$.
-	
-	\pause
-	Die Nullstelle $\quer{x}$ ist ein Fixpunkt von $\Phi$, da
-	\begin{equation*}
+	\begin{minipage}{\dimexpr0.6\linewidth-\fboxrule-\fboxsep}
+		\textbf{Beobachtung:} \\
+		$x_{i}$ nähert sich der Nullstelle $\quer{x}$ an
+		
+		\pause \smallskip
+		Ein \textit{Fixpunkt} von $\Phi$ ist ein Punkt $x$ mit $\Phi(x) = x$.
+		
+		\pause \smallskip
+		Die Nullstelle $\quer{x}$ ist ein Fixpunkt von $\Phi$, da
+		\begin{equation*}
 		\Phi(\quer{x}) = \quer{x} - \frac{g(\quer{x})}{g'(\quer{x})} = \quer{x} .
-	\end{equation*} 
+		\end{equation*} 
+	\end{minipage}
+	\pause
+	\begin{minipage}{\dimexpr0.4\linewidth-\fboxrule-\fboxsep}
+		\includegraphics[width=\linewidth]{tut03_fixpunktiteration.png}
+	\end{minipage}
+	
 \end{frame}
 
 \begin{frame} \frametitle{Fixpunktiteration für EBNF}
@@ -343,13 +352,9 @@
 		&= \sem{b}(\rho) \cdot \sem{Y}(\rho) \cup \menge{\epsilon} \\
 		&= \menge{b} \cdot \rho(Y) \cup \menge{\epsilon}
 	\end{align*}
-	
-%	\pause
-	
-%	iterierende Funktion $f \colon (V \to \pows{\Sigma^\ast}) \to (V \to \pows{\Sigma^\ast})$
 \end{frame}
 
-\begin{frame}[t]
+\begin{frame}
 	\begin{align*}
 	\sem{\opt{aXa}{Y}}(\rho) 
 	&= \menge{a} \cdot \rho(X) \cdot \menge{a} \cup \rho(Y) \\
@@ -365,28 +370,29 @@
 			\menge{b} \cdot \purple{\rho}(Y) \cup \menge{\epsilon}
 		 \end{pmatrix}
 	\end{equation*}
+	
+	4 Iterationen durch Anwendung der Funktion $f$:
+	\begin{align*}
+	\begin{pmatrix} \emptyset \\ \emptyset \end{pmatrix}
+	\mapsto^1
+	\begin{pmatrix} \emptyset \\ \menge{\epsilon} \end{pmatrix}
+	\mapsto^2
+	\begin{pmatrix} \menge{\epsilon} \\ \menge{\epsilon, b} \end{pmatrix}
+	&\mapsto^3
+	\begin{pmatrix} \menge{aa, \epsilon, b} \\ \menge{\epsilon, b, bb} \end{pmatrix} \\
+	&\mapsto^4
+	\begin{pmatrix} \menge{aaaa, aa, ab, \epsilon, b} \\ \menge{\epsilon, b, bb, bbb} \end{pmatrix} 
+	\end{align*}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (b) und (c)}
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
 	\begin{equation*}
-		f(\rho) = \begin{pmatrix} 
-		\menge{a} \cdot \rho(X) \cdot \menge{a} \cup \rho(Y) \\ 
-		\menge{b} \cdot \rho(Y) \cup \menge{\epsilon}
-		\end{pmatrix}
-	\end{equation*}
-	
-	Iterationen durch Anwendung der Funktion $f$:
-	\begin{align*}
 		\begin{pmatrix} \emptyset \\ \emptyset \end{pmatrix}
 		\mapsto^1
-		\begin{pmatrix} \emptyset \\ \menge{\epsilon} \end{pmatrix}
-		\mapsto^2
-		\begin{pmatrix} \menge{\epsilon} \\ \menge{\epsilon, b} \end{pmatrix}
-		&\mapsto^3
-		\begin{pmatrix} \menge{aa, \epsilon, b} \\ \menge{\epsilon, b, bb} \end{pmatrix} \\
-		&\mapsto^4
+		\dots
+		\mapsto^4
 		\begin{pmatrix} \menge{aaaa, aa, ab, \epsilon, b} \\ \menge{\epsilon, b, bb, bbb} \end{pmatrix} 
-	\end{align*}
+	\end{equation*}
 	
 	\pause
 	Mithilfe der Ergebnisse der Iterationen und der Intuition anhand der Regelmenge können wir vermuten, dass die syntaktische Kategorie von $X$ ist gegeben durch
@@ -400,8 +406,9 @@
 	\begin{equation*}
 		\rho(S) = \menge{a^n w a^n : n \ge 0, w \in \menge{\epsilon, b}}.
 	\end{equation*}
-	\textbf{zu zeigen:} $\sem{\opt{aSa}{\byp{b}}}(\rho) = \rho(S)$ {\tiny (d.h. $f(\rho) = \rho$)}
+	\textbf{zu zeigen:} $\sem{\opt{aSa}{\byp{b}}}(\rho) = \rho(S)$ \hspace{2em}{\scriptsize (d.h. $f(\rho) = \rho$)}
 	%
+	\pause
 	\begin{align*}
 		&\sem{\opt{aSa}{\byp{b}}}(\rho) \\
 		= \enskip & \menge{a} \rho(S) \menge{a} \cup \gray{(} \menge{b} \cup \menge{\epsilon} \gray{)} \\
@@ -409,7 +416,8 @@
 		= \enskip & \menge{a^{n+1} w a^{n+1} : n \ge 0, w \in \menge{\epsilon, b}} \cup \menge{\epsilon, b} \\
 		= \enskip & \menge{a^{n} w a^{n} : n \ge \orange{1}, w \in \menge{\epsilon, b}} \cup \menge{\epsilon, b} \\
 		= \enskip & \menge{a^{n} w a^{n} : n \ge \orange{1}, w \in \menge{\epsilon, b}} \cup \menge{a^{n} w a^{n} : \orange{n = 0}, w \in \menge{\epsilon, b}} \\
-		= \enskip & \menge{a^n w a^n : n \ge 0, w \in \menge{\epsilon, b}}
+		= \enskip & \menge{a^n w a^n : n \ge 0, w \in \menge{\epsilon, b}} \\
+		= \enskip & \rho(S)
 	\end{align*}
 \end{frame}
 
