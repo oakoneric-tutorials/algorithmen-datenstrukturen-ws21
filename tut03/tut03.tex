@@ -310,7 +310,7 @@
 \section{Übungsblatt 3}
 
 \begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
-	Gesucht ist eine EBNF-Definition $\mathcal{E} = (V,\Sigma, S, R)$ mit $\Sigma = \menge{a,b,c,d}$, sodass 
+	Gesucht ist eine EBNF-Definition $\mathcal{E} = (V,\Sigma, S, R)$ mit $\Sigma = \menge{a,b,c}$, sodass 
 	\begin{equation*}
 		W(\mathcal{E}, S) = \menge{a^k b^\ell c^{2k} c^m : k \ge 1, \ell \ge m \ge 0} .
 	\end{equation*}
@@ -329,7 +329,7 @@
 	\begin{align*}
 		V &= \menge{S,A} \\
 		R &= \Big\{ 
-		S ::= \orange{a} \ \opt{ S }{ A } \orange{cc}, \quad
+		S ::= \orange{a} \ \opt{ S }{ A } \ \orange{cc}, \quad
 		A ::= \opt{\purple{b} A \purple{c}}{ \green{\wdh{b}} }  
 		\Big\}
 	\end{align*}
@@ -341,6 +341,7 @@
 		R' = \menge{ \enskip X ::= \opt{aXa}{Y}, \quad Y ::= \byp{bY} \enskip} .
 	\end{equation*}
 	
+	\pause
 	Wir brauchen die Semantik der EBNF-Terme:
 	\begin{align*}
 		\sem{\opt{aXa}{Y}}(\rho) 
@@ -370,7 +371,8 @@
 			\menge{b} \cdot \purple{\rho}(Y) \cup \menge{\epsilon}
 		 \end{pmatrix}
 	\end{equation*}
-	
+
+	\pause	
 	4 Iterationen durch Anwendung der Funktion $f$:
 	\begin{align*}
 	\begin{pmatrix} \emptyset \\ \emptyset \end{pmatrix}
@@ -381,7 +383,7 @@
 	&\mapsto^3
 	\begin{pmatrix} \menge{aa, \epsilon, b} \\ \menge{\epsilon, b, bb} \end{pmatrix} \\
 	&\mapsto^4
-	\begin{pmatrix} \menge{aaaa, aa, ab, \epsilon, b} \\ \menge{\epsilon, b, bb, bbb} \end{pmatrix} 
+	\begin{pmatrix} \menge{aaaa, aa, aba, \epsilon, b, bb} \\ \menge{\epsilon, b, bb, bbb} \end{pmatrix} 
 	\end{align*}
 \end{frame}
 
@@ -402,6 +404,7 @@
 \end{frame}
 
 \begin{frame} \frametitle{Aufgabe 2}
+	\small 
 	Sei $\mathcal{E} = (V, \Sigma, S, R)$ mit $V = \menge{S}$, $\Sigma = \menge{a,b}$ und $R = \menge{S ::= \opt{aSa}{\byp{b}}}$. Außerdem sei $\rho \colon V \to \pows{\Sigma^\ast}$ mit
 	\begin{equation*}
 		\rho(S) = \menge{a^n w a^n : n \ge 0, w \in \menge{\epsilon, b}}.
