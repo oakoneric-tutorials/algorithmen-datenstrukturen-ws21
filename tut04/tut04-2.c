@@ -2,46 +2,34 @@
 ------------------------------------------------------------------------------
 ALGORITHMEN & DATENSTRUKTUREN
 Eric Kunze 
-Github: https://github.com/oakoneric/algorithmen-datenstrukturen-ws20
-Website: https://oakoneric.github.io/aud20.html
+Website: https://oakoneric.github.io/aud21
 ------------------------------------------------------------------------------
-Aufgabe 2 
+Aufgabe 2
 ------------------------------------------------------------------------------
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
-    int matches, turn;
-    int z;
-    
-    scanf("%d", &matches);
-    turn = 1;
-    
-    while ( matches > 0 ){
-        if (turn == 1){
-            // Zug des Computers
-            z = (matches - 1) % 4;
-            if (z == 0)
-                z = 1;
-            matches = matches - z;
-            turn = 0;
-            // Bekanntgabe der verbleibenden Streichhoelzer
-            printf("Der Computer zog %d Strichhoelzer;\n", z);
-            printf("somit verbleiben %d Streichhoelzer.\n", matches);
-        } else {
-            // Zug des Menschen
-            scanf("%d", &z);
-            matches = matches - z;
-            turn = 1;
-        }
-    }
-    
-    // Bekanntgabe des Gewinners
-    if (turn == 1)
-        printf("Der Computer gewinnt.");
-    else
-        printf("Der Mensch gewinnt.");
-    
+	unsigned int guess, number, n;
+
+	scanf("%u", &n);
+	
+    number = 1 + rand() % n;
+	
+    while(1) {
+		printf("Zahl raten: ");
+		scanf("%u", &guess);
+		if (guess == number) {
+			printf("Sehr gut!\n");
+			return 0;
+		} else if (guess > number) {
+			printf("Zahl ist kleiner!\n");
+		} else {
+			printf("Zahl ist groesser!\n");
+		}
+	}
+	
     return 0;
 }

@@ -98,7 +98,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[fragile] \frametitle{C}
+\begin{frame}[fragile] \frametitle{Programmieren mit C = Crogrammieren}
 	\begin{itemize}
 		\item Input / Output: \lstinline{#include <stdio.h>}
 		\item Variablentypen: z.B. \lstinline{int}, \lstinline{float}, \lstinline{char}
@@ -115,12 +115,13 @@
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Input \& Output}
+	... benötigt \lstinline|#include <stdio.h>|
 	\begin{itemize}
 		\item Einlesen: \lstinline{scanf("%d", &n);}
 		\item Ausgeben: \lstinline{printf("n!=%d\n", factorial);}
 	\end{itemize}
 
-	weiter Informationen: \\
+	weitere Informationen: \\
 	\url{https://www.tutorials.at/c/03-dateneingabe-ausgabe.html}
 			
 			
@@ -184,7 +185,7 @@ for ( Assignment ; BoolExp ; Assignment ) {
 \end{lstlisting}	
 	zum Beispiel:
 \begin{lstlisting}[style=example]
-for (i = 1; i <= n; i = i + 1){
+for (int i = 1; i <= n; i = i + 1){
 	printf("i = %d\n", i);
 }
 \end{lstlisting}	
@@ -280,8 +281,33 @@ int main(){
 	\end{lstlisting}
 \end{frame}
 
-
 \begin{frame}[fragile] \frametitle{Aufgabe 2}
+	\begin{lstlisting}[style=frame, showstringspaces=false, basicstyle=\ttfamilywithbold\scriptsize]
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+	unsigned int guess, number, n;
+	scanf("%u", &n);
+	number = 1 + rand() % n;
+	while(1) {
+		printf("Zahl raten: ");
+		scanf("%u", &guess);
+		if (guess == number) {
+			printf("Sehr gut!\n");
+			return 0;
+		} else if (guess > number) {
+			printf("Zahl ist kleiner!\n");
+		} else {
+			printf("Zahl ist groesser!\n");
+		}
+	}
+	return 0;
+}
+	\end{lstlisting}%
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Zusatzaufgabe 1}
 	\footnotesize
 	\begin{itemize}
 		\item \textbf{A:} \lstinline|matches > 0|

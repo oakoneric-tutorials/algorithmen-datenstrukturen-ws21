@@ -2,8 +2,7 @@
 ------------------------------------------------------------------------------
 ALGORITHMEN & DATENSTRUKTUREN
 Eric Kunze 
-Github: https://github.com/oakoneric/algorithmen-datenstrukturen-ws20
-Website: https://oakoneric.github.io/aud20.html
+Website: https://oakoneric.github.io/aud21
 ------------------------------------------------------------------------------
 Aufgabe 1 c
 ------------------------------------------------------------------------------
