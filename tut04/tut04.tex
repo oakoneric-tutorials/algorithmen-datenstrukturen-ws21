@@ -45,7 +45,9 @@
 	numbersep=5pt,
 	language=C,
 	tabsize=2,
-	basicstyle=\normalsize\ttfamilywithbold} 
+	basicstyle=\normalsize\ttfamilywithbold,
+	showstringspaces=false,
+} 
 
 \lstdefinestyle{example}{
 	basicstyle=\small\ttfamilywithbold,   
@@ -118,7 +120,7 @@
 	... benötigt \lstinline|#include <stdio.h>|
 	\begin{itemize}
 		\item Einlesen: \lstinline{scanf("%d", &n);}
-		\item Ausgeben: \lstinline{printf("n!=%d\n", factorial);}
+		\item Ausgeben: \lstinline{printf("n! = %d\n", factorial);}
 	\end{itemize}
 
 	weitere Informationen: \\
