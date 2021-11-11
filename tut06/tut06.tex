@@ -70,100 +70,23 @@
 \DeclareMathOperator{\ack}{\mathbf{ack}}
 \usepackage{MnSymbol}
 
-\newcommand{\col}[1]{\textcolor{cdpurple}{#1}}
-\newcolumntype{R}[1]{>{\centering\arraybackslash}p{#1}}
-
-%%%% EBNF-Terme %%%%
-\newcommand{\wdh}[1]{\hat{\{} \ #1 \ \hat{\}}}
-\newcommand{\opt}[2]{\hat{(} \ #1 \ \hat{|} \ #2 \ \hat{)}}
-\newcommand{\byp}[1]{\hat{[} \ #1 \ \hat{]}}
-\newcommand{\rdb}[1]{\hat{(} \ #1 \ \hat{)}}
+\usepackage{qtree}
+\usepackage[edges]{forest}
 
 \begin{document}	
 	\title{Algorithmen und Datenstrukturen}
-	\subtitle{Übung 6: Arrays \& Listen}
+	\subtitle{Übung 6: Listen \& Bäume}
 	\author{Eric Kunze}
-	\email{eric.kunze@mailbox.tu-dresden.de}
+	\email{eric.kunze@tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{04.12.2020}
+	\date{\today}
 
 	\maketitle
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Arrays}
-
-\begin{frame} \frametitle{Arrays}
-	\begin{description}
-		\item[Deklaration (als EBNF):]
-		$\texttt{ElementType} \enskip \texttt{Ident} \enskip \wdh{\texttt{[} \texttt{Number} \texttt{]}}\enskip  \texttt{;}$ \vspace{-\baselineskip}
-		\pause
-		\begin{itemize}
-			\item \texttt{ElementType} $\dots$ Typ eines Eintrags
-			\item \texttt{Number} $\dots$ Anzahl der Einträge
-			\item \texttt{Ident} $\dots$ Bezeichner des Arrays
-		\end{itemize}
-		\pause
-		\item[Beispiele:]
-		\begin{itemize}
-			\item Liste: \lstinline{int liste[5];}
-			\item Matrix: \lstinline{int matrix[3][4];}
-		\end{itemize}
-		\pause
-		\item[Initialisierungen:] ~
-		\begin{itemize}
-			\item \lstinline|int liste[5] = \{2,7,0,-4,1\};|
-			\item \lstinline{int matrix[3][4] = \{ \{1,2,3,4\}, \{5,6,7,8\}, \{2,3,4,5\} \};}
-		\end{itemize}
-		\pause
-		\item[Zuweisungen:] \textit{Indizierung beginnt bei \texttt{0}}
-		\begin{itemize}
-			\item \lstinline{liste[2] = 16;} $\leadsto$ \lstinline{[2,7,16,-4,1]} 
-			\item \lstinline{matrix[1][3] = 0;} $\leadsto$ $\left( \begin{smallmatrix} 1 & 2 & 3 & 4 \\ 5 & 6 & 7 & 0 \\ 2 & 3 & 4 & 5 \end{smallmatrix} \right)$
-		\end{itemize}
-	\end{description}
-\end{frame}
-
-\begin{frame}[fragile] \frametitle{Aufgabe 1}
-	
-	Ist die Zeichenkette ein Palindrom, so soll der aktuelle Parameter \texttt{korrekt} im Aufruf von \texttt{palindrom1}
-	den Wert \texttt{1} annehmen, sonst \texttt{0}.
-	
-	\textbf{falscher Code:}
-	\begin{lstlisting}
-		palindrom1(char feld[], int l, int korrekt) {
-			int i = 1;
-			l = l - 1;
-			while (i < l && korrekt) {
-				korrekt = feld[i] == feld[l];
-				i = i + 1;
-			}
-			return korrekt;
-		}
-	\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile] \frametitle{Aufgabe 1}
-	\textbf{richtiger Code:} \pause
-	\begin{lstlisting}[style=notebook]
-		void palindrom1(char feld[], int l, int *korrekt) {
-			int i = 0;    // muss mit 0 statt 1 initialisiert werden
-			l = l - 1;
-			*korrekt = 1; // muss mit 1 initialisiert werden
-			while (i < l && *korrekt) {
-				*korrekt = feld[i] == feld[l];
-				i = i + 1;
-				l = l - 1;  // l muss dekrementiert werden
-			}
-			// kein return, weil rueckgabetyp void
-		}
-	\end{lstlisting}
-\end{frame}
-
-\section{Verkettete Listen}
 
 \begin{frame}[fragile] \frametitle{Verkettete Listen}
 	Wir betrachten \textit{verkettete} Listen.
@@ -209,7 +132,7 @@ struct element {int value; list next};
 	\end{itemize}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 2 --- Teil (a)}
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
 	\textbf{Anfügen an eine Liste}
 	
 	\includegraphics[width=\linewidth]{tut06-graphics/tut06-append1} \\ \pause
@@ -218,7 +141,7 @@ struct element {int value; list next};
 	\includegraphics[width=\linewidth]{tut06-graphics/tut06-append4}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (a)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (a)}
 	\textbf{Anfügen an eine Liste}
 	
 	\begin{center}
@@ -237,7 +160,7 @@ struct element {int value; list next};
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (a)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (a)}
 	\textbf{Anfügen an eine Liste}
 	\begin{itemize}
 		\item Gehe zum Ende der Liste
@@ -261,7 +184,7 @@ struct element {int value; list next};
 	\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (b)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (a)}
 	\textbf{Liste erstellen (mit \texttt{append})}
 	\begin{itemize}
 		\item erzeuge leere Liste
@@ -278,7 +201,7 @@ struct element {int value; list next};
 	\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (c)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (b)}
 	\textbf{Summe einer Liste --- iterativ}
 	\begin{itemize} \small
 		\item addiere Schlüsselwerte in Hilfsvariable \texttt{result} auf
@@ -305,7 +228,7 @@ struct element {int value; list next};
 	\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (c)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (b)}
 	\textbf{Summe einer Liste --- rekursiv}
 	\begin{itemize}
 		\item definiere Basisfall: leere Liste $\to$ Rückgabewert \texttt{0}
@@ -330,7 +253,7 @@ struct element {int value; list next};
 	\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (d)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (c)}
 	\textbf{Löschen von Elementen}
 	\begin{center}
 		\includegraphics[width=\linewidth]{tut06-graphics/tut06-rmEvans-1} \\ \pause
@@ -340,7 +263,7 @@ struct element {int value; list next};
 \end{frame}
 
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (d)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (c)}
 	\textbf{Löschen von Elementen --- iterativ}
 	\begin{itemize}
 		\item laufe Liste entlang, solange nicht am Ende angekommen
@@ -368,7 +291,7 @@ struct element {int value; list next};
 	\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (d)}
+\begin{frame}[fragile] \frametitle{Aufgabe 1 --- Teil (c)}
 	\textbf{Löschen von Elementen --- rekursiv} \small
 	\begin{itemize}
 		\item Basisfall: keine Liste oder Liste leer $\to$ tue nichts
@@ -397,33 +320,6 @@ struct element {int value; list next};
 \end{frame}
 
 
-\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (e)}
-	\textbf{neue Liste ohne bestimmte Elemente} \small
-	\begin{itemize}
-		\item erzeuge neue Liste
-		\item laufe durch alte Liste durch -- betrachte Schlüsselwerte
-		\begin{itemize} \footnotesize
-			\item gerade: Element überspringen
-			\item ungerade: an neue Liste anfügen
-		\end{itemize}
-	\end{itemize}
-	
-	\pause
-	
-	\begin{lstlisting}[style=notebook]
-	list odds(list lp){
-			list erg = NULL; /* erzeuge neue liste */		
-			while (lp != NULL ){           
-					if (lp->value % 2 != 0) 
-							append(&erg, lp->value);
-					lp = lp->next;              
-			}
-			return erg;
-	}
-	\end{lstlisting}
-\end{frame}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
@@ -436,6 +332,188 @@ struct element {int value; list next};
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{frame}[fragile, t] \frametitle{Datenstrukturen}
+	\begin{lstlisting}[style=notebook]
+		typedef struct element *list;
+		struct element { int value; list next; };
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		typedef struct node *tree;
+		struct node { int key; tree left, right; };
+		
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (a)}
+	\textbf{Verknüpfen zweier Bäume mit einem neuen Wurzelnoten}
+	\pause
+	\begin{itemize}
+		\item lege neuen Wurzelknoten an
+		\item verknüpfe Wurzelknoten mit bestehenden Bäumen
+		\item fülle neue Wurzel mit Inhalt
+	\end{itemize}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		tree createNode(int n, tree l, tree r) {
+			tree t   = malloc(sizeof(struct node));
+			t->left  = l;
+			t->right = r;
+			t->key   = n;
+			return t;
+		}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (a)}
+	\textbf{Beispielbaum:}
+	\begin{center}
+		\begin{forest}
+			for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=10mm }
+			[4 	[5] [2 [0] [,no edge, draw=none]] ]
+		\end{forest}
+	\end{center}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		tree bsp = 
+		createNode(4,
+		createNode(5, NULL, NULL),
+		createNode(2,
+		createNode(0, NULL, NULL),
+		NULL));
+	\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (b)}
+	\begin{tabularx}{\linewidth}{m{2cm} m{2cm} m{1.5cm} m{3cm}}
+		\textbf{Beispiel:}
+		&
+		\begin{forest}
+			for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=10mm }
+			[4 	[5] [2 [0] [,no edge, draw=none]] ]
+		\end{forest}
+		&
+		$\overset{\texttt{insertl(\&bsp)}}{\longrightarrow}$
+		&
+		\begin{forest}
+			for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+			[4 	[5 [18] [,no edge, draw=none]] [2 [0] [,no edge, draw=none]] ]
+		\end{forest}
+	\end{tabularx}
+	\pause
+	\begin{itemize}
+		\item solange kein Blatt erreicht: füge in den linken Teilbaum ein
+		\item am Blatt: ein neuen Knoten einfügen (\texttt{createNode})
+	\end{itemize}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		void insertl(tree *tp, int n) {
+			if (*tp != NULL)
+			insertl(&((*tp)->left), n);
+			else
+			*tp = createNode(n, NULL, NULL);
+		}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (c)}
+	\textbf{Beispiele:}
+	
+	\begin{center}
+		\begin{tabular}{ccc}
+			bsp & s & t \\ \\
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[4 	[5 [18] [,no edge, draw=none]] [2 [0] [,no edge, draw=none]] ]
+			\end{forest}
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[3 [2] [4]] [1] ]
+			\end{forest}
+			&
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[2] [3] ]
+			\end{forest} \\ \pause
+			\footnotesize \texttt{leafprod(bsp) = 0} &
+			\footnotesize \texttt{leafprod(s) = 8} &
+			\footnotesize \texttt{leafprod(t) = 6}
+		\end{tabular}
+	\end{center}
+\end{frame}
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (c)}
+	\begin{itemize}
+		\item leerer Baum: \texttt{leafprod = 1}
+		\item Rekursion: berechne \texttt{leafprod} in linkem und rechtem Teilbaum
+	\end{itemize}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		int leafprod(tree t){
+			if (t == NULL)
+			return 1;
+			if (t->left == NULL && t->right == NULL)
+			return t->key;
+			return leafprod(t->left) * leafprod(t->right);
+		}
+	\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (d)}
+	Man übernehme nur gerade Elemente!
+	
+	\textbf{Beispiel:}
+	\begin{center}
+		\begin{tabularx}{\linewidth}{m{2cm} m{2cm} m{2cm}}
+			\begin{forest}
+				for tree={ grow=south, circle, draw, minimum size=3ex, inner sep=1pt, s sep=3mm }
+				[2 	[3 [2] [4]] [1] ]
+			\end{forest}
+			&
+			$\overset{\texttt{treeToList(s)}}{\longrightarrow}$
+			&
+			\begin{ttfamily}
+				[2, 4, 2]
+			\end{ttfamily}
+		\end{tabularx}
+	\end{center}
+	\pause
+	\textbf{Inorder -- Durchlauf:}
+	\begin{itemize}
+		\item traversiere durch linken Teilbaum
+		\item Wurzel gerade? $\to$ anhängen an Liste mit \texttt{append}
+		\item traversiere durch rechten Teilbaum
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (d)}
+	\begin{lstlisting}[style=notebook]
+		void append(list *lp, int n)
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		void treeToList_rec(tree t, list *lp){
+			if (t == NULL) return ;
+			treeToList_rec(t->left, lp);
+			if (t->key % 2 == 0)
+			append(lp, t->key);
+			treeToList_rec(t->right, lp);
+		}	
+	\end{lstlisting}
+	\pause
+	\begin{lstlisting}[style=notebook]
+		list treeToList(tree t){
+			list l = NULL;
+			treeToList_rec(t,&l);
+			return l;
+		}
+	\end{lstlisting}
+\end{frame}
 
 
 \end{document}

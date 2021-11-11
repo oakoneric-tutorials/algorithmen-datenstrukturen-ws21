@@ -28,32 +28,16 @@ struct node
 // Teil (a)
 tree createNode(int n, tree l, tree r)
 {
-    tree t = malloc(sizeof(struct node));
-    t->left = l;
-    t->right = r;
-    t->key = n;
-    return t;
 }
 
 // Teil (b)
 void insertl(tree *tp, int n)
 {
-    if (*tp != NULL)
-        insertl(&((*tp)->left), n);
-    else
-        *tp = createNode(n, NULL, NULL);
 }
 
 // Teil (c)
 int leafprod(tree t)
 {
-    if (t == NULL)
-        return 1;
-
-    if (t->left == NULL && t->right == NULL)
-        return t->key;
-
-    return leafprod(t->left) * leafprod(t->right);
 }
 
 // Teil (d)
@@ -69,19 +53,6 @@ void append(list *lp, int n)
 
 void treeToList_rec(tree t, list *lp)
 {
-    if (t == NULL)
-        return;
-    treeToList_rec(t->left, lp);
-    if (t->key % 2 == 0)
-        append(lp, t->key);
-    treeToList_rec(t->right, lp);
-}
-
-list treeToList(tree t)
-{
-    list l = NULL;
-    treeToList_rec(t, &l);
-    return l;
 }
 
 /* ----------------------------------------- */
@@ -113,8 +84,8 @@ void printList(list l)
 
 int main()
 {
-
     // zu Teil (a)
+    /*
     printf("\n============ Teil (a) ========================\n");
     tree bsp =
         createNode(4,
@@ -132,14 +103,18 @@ int main()
     tree t = createNode(2, createNode(2, NULL, NULL), createNode(3, NULL, NULL));
     printf("t = ");
     printTree(t, 0);
+    */
 
     // zu Teil (b)
+    /*
     printf("\n============ Teil (b) ========================\n");
     insertl(&bsp, 18);
     printf("bsp = ");
     printTree(bsp, 0);
+    */
 
     // zu Teil (c)
+    /*
     printf("\n============ Teil (c) ========================\n");
     int prod = leafprod(bsp);
     printf("leafprod(bsp) = %d\n", prod);
@@ -147,8 +122,10 @@ int main()
     printf("leafprod(s) = %d\n", prod);
     prod = leafprod(t);
     printf("leafprod(t) = %d\n", prod);
+    */
 
     // zu Teil (d)
+    /*
     printf("\n============ Teil (e) ========================\n");
 
     printf("\ntreeToList(bsp) = ");
@@ -159,6 +136,7 @@ int main()
 
     printf("\ntreeToList(t) = ");
     printList(treeToList(t));
+    */
 
     return 0;
 }

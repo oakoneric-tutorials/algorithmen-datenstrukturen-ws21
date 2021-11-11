@@ -1,62 +1,164 @@
-/*
+/* 
 ------------------------------------------------------------------------------
 ALGORITHMEN & DATENSTRUKTUREN
-Eric Kunze
-Github: https://github.com/oakoneric/algorithmen-datenstrukturen-ws20
-Website: https://oakoneric.github.io/aud20.html
+Eric Kunze 
+Website: https://oakoneric.github.io/aud21
 ------------------------------------------------------------------------------
 Aufgabe 1
 ------------------------------------------------------------------------------
 */
 
 #include <stdio.h>
+#include <stdlib.h> // benötigt für malloc
 
-palindrom(char feld[], int l, int korrekt) {
-    int i = 1;
-    l = l - 1;
-    while (i < l && korrekt) {
-        korrekt = feld[i] == feld[l];
-        i = i + 1;
+typedef struct element *list;
+struct element
+{
+    int value;
+    list next;
+};
+
+void append(list *lp, int n)
+{
+    while (*lp != NULL)
+        lp = &((*lp)->next);
+    /* gehe bis zum ende der liste */
+
+    (*lp) = malloc(sizeof(struct element));
+    /* erstelle ein neues element */
+    (*lp)->value = n;
+    /* fuelle den neuen container mit inhalt */
+    (*lp)->next = NULL;
+}
+
+int sum_rec(list l)
+{
+    if (l == NULL)
+        return 0;
+    /* nach letztem element nichts mehr addieren */
+
+    return l->value + sum_rec(l->next);
+    /* nehme immer einen key und addiere die summe der restliste */
+}
+
+int sum_it(list l)
+{
+    int result = 0;
+
+    while (l != NULL)
+    {
+        result += l->value; /* result = result + l -> value */
+        l = l->next;        /* schalte "start"zeiger ein element weiter */
     }
-    return korrekt;
+    return result;
 }
 
-void palindrom1(char feld[], int l, int *korrekt) {
-    int i = 0;    // muss mit 0 statt 1 initialisiert werden
-    l = l - 1;
-    *korrekt = 1; // muss mit 1 initialisiert werden
-    while (i < l && *korrekt) {
-        *korrekt = feld[i] == feld[l];
-        i = i + 1;
-        l = l - 1;  // l muss dekrementiert werden
+void rmEvens_rec(list *lp)
+{ /* *lp heißt: wir übergeben einen pointer (list pointer) */
+    if (lp == NULL || *lp == NULL)
+        return;
+    /* keine liste oder liste leer */
+
+    if ((*lp)->value % 2 == 0)
+    {
+        list tmp = *lp;
+        /* speicherung des zu löschenden elements (um speicher dann zu befreien, sonst speicherleichen) */
+        *lp = (*lp)->next;
+        /* weiterschalten des ersten pointers */
+        free(tmp);
+        /* speicher des zu löschenden elements befreien */
     }
-    // kein return, weil rueckgabetyp void
+    else
+    {
+        lp = &(*lp)->next;
+        /* startpointer weiterschalten - kein löschen notwendig */
+    }
+
+    rmEvens_rec(lp); /* verfahre so weiter mit der restlichen liste */
 }
 
-int palindrom2(char feld[], int lo, int hi) {
-    if (hi <= lo) return 1;
-    if (feld[lo] != feld[hi]) return 0;
-    return palindrom2(feld, lo + 1, hi - 1);
+void rmEvens_it(list *lp)
+{
+    while (lp != NULL && *lp != NULL)
+    {
+        if ((*lp)->value % 2 == 0)
+        {
+            list tmp = *lp;
+            *lp = (*lp)->next;
+            free(tmp);
+        }
+        else
+            lp = &(*lp)->next;
+    }
 }
 
+/* diese funktion war nicht gefordert, 
+ * ist aber ein gutes beispiel fuer den fall, 
+ * dass die bestehende liste nicht verändert werden soll
+ */
+list odds(list lp)
+{
+    list erg = NULL; /* erzeuge neue liste - alte soll nicht verändert werden */
 
-int main() {
-    #define ANZ 4
+    while (lp != NULL)
+    { /* gehe durch ganze liste durch */
+        if (lp->value % 2 != 0)
+        {                            /* prüfe ob ungerade schluessel */
+            append(&erg, lp->value); /* hänge ungerade schluessel an neue liste an */
+        }
+        lp = lp->next; /* gehe in jedem fall ein element weiter */
+    }
+    return erg;
+}
 
-    char pal[4] = { 'o', 't', 't', 'o' };
-    char nopal[5] = { 't', 'o', 't', 'o', 'd' };
-    int ispal;
-    palindrom1(pal, 4, &ispal);
-    if (ispal) printf("otto ist ein Palindrom.\n");
-    palindrom1(nopal, 5, &ispal);
-    if (ispal) printf("totod ist ein Palindrom.\n");
+// zwei nuetzliche hilfsfunktionen, die nicht gefordert waren
 
+// hilsfunktion zur erzeugung von listen:
+list cons(int n, list next)
+{
+    list l = malloc(sizeof(struct element));
+    /* reserviere speicher für ein listenelement */
+    l->value = n;   /* trage key ein */
+    l->next = next; /* pointer auf nächstes listenelement bzw. restliste */
+    return l;
+}
 
-    char feld[ANZ] = { 'o', 't', 't', 'o' };
-    int korr;
+// hilfsfunktion zur ausgabe von listen:
+void printList(list l)
+{
+    printf("[");
+    while (l)
+    {                           /* solange liste nicht leer ist (listpointer nicht null*/
+        printf("%d", l->value); /* ausgabe des keys */
+        if (l->next)
+            printf(", "); /* wenn noch weitere elemente existieren (next-pointer nicht null */
+        l = l->next;      /* pointer weiterschalten um restliste auszugeben */
+    }
+    printf("]\n");
+}
 
-    korr = palindrom2(feld, 0, ANZ-1);
-    printf("korr = %d\n", korr);
+int main()
+{
+    /* erstelle eine liste [4,2,0,1] */
+    list l = NULL;
+    append(&l, 4);
+    append(&l, 2);
+    append(&l, 0);
+    // list l2 = cons(4, cons(2, cons(0, NULL)));
+
+    printf("l: ");
+    printList(l);
+
+    printf("sum_rec(l): %d\n", sum_rec(l));
+    printf("sum_it(l): %d\n\n", sum_it(l));
+
+    rmEvens_rec(&l);
+    printf("l: ");
+    printList(l);
+
+    list newList = odds(l);
+    printf("newList: ");
+    printList(newList);
 
     return 0;
 }

@@ -1,11 +1,10 @@
-/*
+/* 
 ------------------------------------------------------------------------------
 ALGORITHMEN & DATENSTRUKTUREN
-Eric Kunze
-Github: https://github.com/oakoneric/algorithmen-datenstrukturen-ws20
-Website: https://oakoneric.github.io/aud20.html
+Eric Kunze 
+Website: https://oakoneric.github.io/aud21
 ------------------------------------------------------------------------------
-Aufgabe 2
+Aufgabe 1
 ------------------------------------------------------------------------------
 */
 
@@ -13,28 +12,35 @@ Aufgabe 2
 #include <stdio.h>
 
 typedef struct element *list;
-struct element { int value; list next; };
+struct element
+{
+    int value;
+    list next;
+};
 
 /*
 problem: beim löschen des ersten listenelements geht der zugriff auf die liste verloren
 ausweg: pointer auf pointer - erster pointer hält stets listenanfang fest
 */
 
-void rmEvens_it(list lp) {
-    while (lp != NULL) {
-        if (lp->value % 2 == 0) {
+void rmEvens_it(list lp)
+{
+    while (lp != NULL)
+    {
+        if (lp->value % 2 == 0)
+        {
             list tmp = lp;
             lp = lp->next;
             free(tmp);
-        } else 
+        }
+        else
             lp = lp->next;
     }
 }
 
-
-
 // alternative zur erzeugung von listen:
-list cons(int n, list next) {
+list cons(int n, list next)
+{
     list l = malloc(sizeof(*l)); /* reserviere speicher für ein listenelement */
     l->value = n;                /* trage key ein */
     l->next = next;              /* pointer auf nächstes listenelement bzw. restliste */
@@ -42,19 +48,21 @@ list cons(int n, list next) {
 }
 
 // hilfsfunktion zur ausgabe von listen:
-void printList(list l) {
+void printList(list l)
+{
     printf("[");
-    while(l) {                /* solange liste nicht leer ist (listpointer nicht null*/
-        printf("%d", l->value);     /* ausgabe des keys */
-        if(l->next) printf(", ");   /* wenn noch weitere elemente existieren (next-pointer nicht null */
-        l = l->next;                /* pointer weiterschalten um restliste auszugeben */
+    while (l)
+    {                           /* solange liste nicht leer ist (listpointer nicht null*/
+        printf("%d", l->value); /* ausgabe des keys */
+        if (l->next)
+            printf(", "); /* wenn noch weitere elemente existieren (next-pointer nicht null */
+        l = l->next;      /* pointer weiterschalten um restliste auszugeben */
     }
     printf("]\n");
 }
 
-
-
-int main() {
+int main()
+{
     /* erstelle eine liste [4,2,0,1] */
     list l = cons(4, cons(2, cons(0, cons(1, NULL))));
 
@@ -64,7 +72,7 @@ int main() {
     rmEvens_it(l);
     printf("l: ");
     printList(l);
-    
+
     // tipp: ausfuehrung in der commandozeile mit strg+c abbrechen ;)
 
     return 0;
