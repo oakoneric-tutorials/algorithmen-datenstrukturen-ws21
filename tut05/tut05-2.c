@@ -10,13 +10,13 @@ Aufgabe 2
 
 #include <stdio.h>
 
-void swap(int *x, int *y) /* hier weist der Stern auf Zeiger hin */
+void swap(int *a, int *b) /* hier weist der Stern auf Zeiger hin */
 {
     int tmp;
 
-    tmp = *x;
-    *x = *y;
-    *y = tmp;
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
     /* Der Stern vor einer Variablen bedeutet: Dereferenzieren
        nutze den Wert, der in der Adresse von x steht (insbes. nicht die Adresse)
     */
