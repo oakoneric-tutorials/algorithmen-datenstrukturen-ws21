@@ -178,7 +178,7 @@ struct element {int value; list next};
 			while(*lp != NULL) 
 					lp = &((*lp)->next) ; 
 			(*lp) = malloc(sizeof(struct element)); 
-			(*lp)->key  = n;   
+			(*lp)->value  = n;   
 			(*lp)->next = NULL; 
 	}
 	\end{lstlisting}
