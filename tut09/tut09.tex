@@ -236,11 +236,12 @@
 \end{frame}
 
 \begin{frame}[fragile] \frametitle{Erinnerung: Bäume}
+	\small
 	\begin{lstlisting}[style=notebook]
 typedef struct node *tree;
 struct node { int key; tree left, right; };
 	\end{lstlisting}
-	
+
 	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
 		\begin{tikzpicture}[%
 			>=stealth',
@@ -267,14 +268,8 @@ struct node { int key; tree left, right; };
 				\draw[->, thick, color=cdgray] (0,1.75) --node[pos=0, above]{\texttt{tree* tp}} (1,1.75);
 			}	
 		\end{tikzpicture}
-		\onslide<2->{%
-			\begin{itemize}
-				\item Verarbeitung eines Baumes: Einfachreferenzen (\texttt{tree t})
-				\item Veränderung eines Baumes: Doppelreferenzen (\texttt{tree *tp})
-			\end{itemize}%
-		}
 	\end{minipage}
-	\pause\pause
+	\onslide<3->{
 	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
 		\begin{tikzpicture}[%
 			>=stealth',
@@ -325,6 +320,13 @@ struct node { int key; tree left, right; };
 			\draw[-|, thick] (rightbox3.center) -- ++( 0.5,-0.5) node[pos=0.5, anchor=west, right, inner sep=8pt]{\texttt{NULL}};
 		\end{tikzpicture}
 	\end{minipage}
+	}
+	\onslide<2->{%
+		\begin{itemize}
+			\item Verarbeitung eines Baumes: Einfachreferenzen (\texttt{tree t})
+			\item Veränderung eines Baumes: Doppelreferenzen (\texttt{tree *tp})
+		\end{itemize}%
+	}
 \end{frame}
 
 
