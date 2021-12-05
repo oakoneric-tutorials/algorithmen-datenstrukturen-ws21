@@ -1,3 +1,5 @@
+// (c) Joshua Uhlig, 2021
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "print_tree.h"
@@ -8,9 +10,8 @@ int _height(tree t)
         return 0;
     int hl = _height(t->left);
     int hr = _height(t->right);
-    if (hl > hr)
-        return hl + 1;
-    return hr + 1;
+
+    return (hl > hr) ? hl + 1 : hr + 1;
 }
 
 int _print_t(tree t, int is_left, int offset, int depth, char s[20][255])
