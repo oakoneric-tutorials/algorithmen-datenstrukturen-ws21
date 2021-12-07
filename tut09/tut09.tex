@@ -329,7 +329,45 @@ struct node { int key; tree left, right; };
 	}
 \end{frame}
 
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (a)}
+	\textbf{neuen Baum mit Balancefaktoren bestimmen}
+	\begin{lstlisting}[style=notebook, basicstyle=\scriptsize\ttfamilywithbold]
+int height(tree t) {
+	if (t == NULL) return 0;
+	
+	int hl = height(t->left);
+	int hr = height(t->right);
+	return (hl > hr) ? hl + 1 : hr + 1;
+}
+	\end{lstlisting}
+	\begin{lstlisting}[style=notebook, firstnumber=11, basicstyle=\scriptsize\ttfamilywithbold]
+tree bfs(tree t) {
+	if (t == NULL) return NULL;
+		
+	tree bf = malloc(sizeof(struct node));
+	bf->key = height(t->right) - height(t->left);
+	bf->left = bfs(t->left);
+	bf->right = bfs(t->right);
+	return bf;
+}
+	\end{lstlisting}
+\end{frame}
 
+\begin{frame}[fragile] \frametitle{Aufgabe 2 --- Teil (b)}
+	\textbf{Linksrotation um die Wurzel}
+	\begin{lstlisting}[style=notebook]
+void lRot(tree *tp) {
+	if (tp == NULL || *tp == NULL)
+		return;
+	
+	tree rightChild = (*tp)->right;
+	(*tp)->right = rightChild->left;
+	rightChild->left = *tp;
+	*tp = rightChild;
+}
+	\end{lstlisting}
+	
+\end{frame}
 
 \section{Topologisches Sortieren}
 
@@ -344,7 +382,7 @@ struct node { int key; tree left, right; };
 			\item $\dots$
 			\item Elektrik im Bad (4) vor Fliesen (5)
 			\item Wohnzimmer tapezieren (6) vor streichen (7)
-			\item Wände streichen (5) und Fliesen (7) vor Möbel aufstellen (8)
+			\item Fliesen (5) und Wände streichen (7) vor Möbel aufstellen (8)
 		\end{itemize}
 		\pause
 		\begin{center}
