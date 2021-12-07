@@ -12,9 +12,10 @@ Aufgabe 2
 #include <stdlib.h>
 #include "print_tree.h"
 /*
-In print_tree.h bzw. print_tree.c wird eine Ausgabe für Bäume definiert (c) Joshua Uhlig.
-Die dafür notwendige Datenstruktur wurde mit ausgelagert und ist daher hier auskommentiert.
-Compile mit "gcc print_tree.c tut09-2.c -o tut09-2"
+In print_tree.h bzw. print_tree.c wird eine Ausgabe für Baeume definiert (c) Joshua Uhlig.
+Compile mit "gcc print_tree.c tut09-2.c -o tut09-2" (print_tree.h und print_tree.c im gleichen Verzeichnis wie tut09-2.c).
+Die dafuer notwendige Datenstruktur (tree und struct node) wurde mit ausgelagert und ist daher hier auskommentiert.
+
 */
 
 /* 
@@ -25,6 +26,20 @@ struct node
     tree left, right;
 }; 
 */
+
+/* ----------------------------------------- */
+/* Hilfsfunktion zum Erstellen von Baeumen    */
+
+tree createNode(int n, tree l, tree r)
+{
+    tree t = malloc(sizeof(struct node));
+    t->left = l;
+    t->right = r;
+    t->key = n;
+    return t;
+}
+
+/* ----------------------------------------- */
 
 // Teil (a)
 
@@ -43,10 +58,17 @@ tree bfs(tree t)
 {
     if (t == NULL)
         return NULL;
+
+    int b = height(t->right) - height(t->left);
+    tree bf = createNode(b, bfs(t->left), bfs(t->right));
+
+    /*
     tree bf = malloc(sizeof(struct node));
     bf->key = height(t->right) - height(t->left);
     bf->left = bfs(t->left);
     bf->right = bfs(t->right);
+    */
+
     return bf;
 }
 
@@ -57,21 +79,10 @@ void lRot(tree *tp)
     if (tp == NULL || *tp == NULL)
         return;
 
-    tree rightChild = (*tp)->right;
-    (*tp)->right = rightChild->left;
-    rightChild->left = *tp;
-    *tp = rightChild;
-}
-
-/* ----------------------------------------- */
-
-tree createNode(int n, tree l, tree r)
-{
-    tree t = malloc(sizeof(struct node));
-    t->left = l;
-    t->right = r;
-    t->key = n;
-    return t;
+    tree rightChild = (*tp)->right;  // sichere Zugriff auf (altes) rechtes Kind der alten Wurzel
+    (*tp)->right = rightChild->left; // Umklappen des inneren Astes
+    rightChild->left = *tp;          // alte Wurzel wird zum linken Kind der neuen Wurzel (= altes rechtes Kind)
+    *tp = rightChild;                // setze neue Wurzel
 }
 
 int main()
