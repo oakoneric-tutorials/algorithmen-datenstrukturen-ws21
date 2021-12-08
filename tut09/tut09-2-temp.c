@@ -18,7 +18,7 @@ Compile mit "gcc print_tree.c tut09-2.c -o tut09-2"
 */
 
 /* 
-typedef struct node *tree;
+typedef struct node* tree;
 struct node
 {
     int key;
@@ -28,8 +28,6 @@ struct node
 
 // Teil (a)
 
-/* ----------------------------------------- */
-
 tree createNode(int n, tree l, tree r)
 {
     tree t = malloc(sizeof(struct node));
@@ -38,6 +36,8 @@ tree createNode(int n, tree l, tree r)
     t->key = n;
     return t;
 }
+
+/* ----------------------------------------- */
 
 int main()
 {
@@ -50,14 +50,11 @@ int main()
                    createNode(3, NULL, NULL));
     printf("t = \n");
     print_t(t);
-
     /*
     tree s = bfs(t);
     printf("s = bfs(t) = \n");
     print_t(s);
-    */
 
-    /*
     printf("\n============ Teil (b) ========================\n");
     // Beispiel aus Aufgabe 1, erster Baum
     tree t2 = createNode(2,
