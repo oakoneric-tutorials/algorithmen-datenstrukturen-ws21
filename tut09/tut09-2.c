@@ -28,7 +28,7 @@ struct node
 */
 
 /* ----------------------------------------- */
-/* Hilfsfunktion zum Erstellen von Baeumen    */
+/* Hilfsfunktion zum Erstellen von Baeumen   */
 
 tree createNode(int n, tree l, tree r)
 {
