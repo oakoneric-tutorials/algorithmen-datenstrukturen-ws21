@@ -1,7 +1,7 @@
-/* 
+/*
 ------------------------------------------------------------------------------
 ALGORITHMEN & DATENSTRUKTUREN
-Eric Kunze 
+Eric Kunze
 Website: https://oakoneric.github.io/aud21
 ------------------------------------------------------------------------------
 Aufgabe 2
@@ -17,13 +17,13 @@ Die dafür notwendige Datenstruktur wurde mit ausgelagert und ist daher hier aus
 Compile mit "gcc print_tree.c tut09-2.c -o tut09-2"
 */
 
-/* 
+/*
 typedef struct node* tree;
 struct node
 {
     int key;
     tree left, right;
-}; 
+};
 */
 
 // Teil (a)
