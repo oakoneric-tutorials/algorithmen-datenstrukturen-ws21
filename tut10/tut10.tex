@@ -82,6 +82,8 @@
 \usepackage{csquotes}
 
 \AtBeginDocument{\colorlet{defaultcolor}{.}}
+\newcommand{\gray}[1]{\textcolor{cdgray!70}{#1}}
+
 \newcommand{\chart}[3]{\begin{tikzpicture}[line cap=round,line join=round,scale=0.25]
 		% \draw[help lines,step=] (-3,-1) grid (3,7);
 		\pgfgettransformentries{\mya}{\tmp}{\tmp}{\tmp}{\tmp}{\tmp}
@@ -538,24 +540,24 @@ void topsort(int n, int e, struct Edge edges[], int ord[]) {
 			\begin{tikzpicture}[scale=0.5]
 				\draw[thick] (-1,0) -- (3,0);
 				
-				\only<1,2>{\draw[onslide={<2>{fill=cdorange!20}}] (0,0) rectangle ++(2,1) node[midway] {(1,--)};}
-				\only<3-16>{\draw[onslide={<3>{fill=cdpurple!10}}, onslide={<16>{fill=cdorange!10}}] (0,0) rectangle ++(2,1) node[midway] {(8,1)};}
-				\only<3,4>{\draw[onslide={<3>{fill=cdpurple!10}}, onslide={<4>{fill=cdorange!20}}] (0,1) rectangle ++(2,1) node[midway] {(2,1)};}
+				\only<1,2>{\draw[onslide={<2>{fill=cdorange!20}}] (0,0) rectangle ++(2,1) node[midway] {(--,1)};}
+				\only<3-16>{\draw[onslide={<3>{fill=cdpurple!10}}, onslide={<16>{fill=cdorange!10}}] (0,0) rectangle ++(2,1) node[midway] {(\gray{1},8)};}
+				\only<3,4>{\draw[onslide={<3>{fill=cdpurple!10}}, onslide={<4>{fill=cdorange!20}}] (0,1) rectangle ++(2,1) node[midway] {(\gray{1},2)};}
 				
-				\only<5-18>{\draw[onslide={<5>{fill=cdpurple!10}}, onslide={<18>{fill=cdorange!10}}] (0,1) rectangle ++(2,1) node[midway] {(9,2)};}
-				\only<5,6>{\draw[onslide={<5>{fill=cdpurple!10}}, onslide={<6>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(3,2)};}
+				\only<5-18>{\draw[onslide={<5>{fill=cdpurple!10}}, onslide={<18>{fill=cdorange!10}}] (0,1) rectangle ++(2,1) node[midway] {(\gray{2},9)};}
+				\only<5,6>{\draw[onslide={<5>{fill=cdpurple!10}}, onslide={<6>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{2},3)};}
 				
-				\only<7,8>{\draw[onslide={<7>{fill=cdpurple!10}}, onslide={<8>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(4,3)};}
+				\only<7,8>{\draw[onslide={<7>{fill=cdpurple!10}}, onslide={<8>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{3},4)};}
 				
-				\only<9,10>{\draw[onslide={<9>{fill=cdpurple!10}}, onslide={<10>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(5,4)};}
+				\only<9,10>{\draw[onslide={<9>{fill=cdpurple!10}}, onslide={<10>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{4},5)};}
 				
-				\only<11,12>{\draw[onslide={<11>{fill=cdpurple!10}}, onslide={<12>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(6,5)};}
+				\only<11,12>{\draw[onslide={<11>{fill=cdpurple!10}}, onslide={<12>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{5},6)};}
 				
-				\only<13,14>{\draw[onslide={<13>{fill=cdpurple!10}}, onslide={<14>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(7,6)};}
+				\only<13,14>{\draw[onslide={<13>{fill=cdpurple!10}}, onslide={<14>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{6},7)};}
 				
-				\only<15,16>{\draw[onslide={<15>{fill=cdpurple!10}}, onslide={<16>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(8,7)};}
+				\only<15,16>{\draw[onslide={<15>{fill=cdpurple!10}}, onslide={<16>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{7},8)};}
 				
-				\only<17,18>{\draw[onslide={<17>{fill=cdpurple!10}}, onslide={<18>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(9,8)};}
+				\only<17,18>{\draw[onslide={<17>{fill=cdpurple!10}}, onslide={<18>{fill=cdorange!20}}] (0,2) rectangle ++(2,1) node[midway] {(\gray{8},9)};}
 				
 				\only<19>{\node[scale=3] at (1,1) {\smiley}};
 			\end{tikzpicture}
