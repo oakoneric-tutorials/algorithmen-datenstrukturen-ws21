@@ -20,7 +20,6 @@
 \usepackage{pgf}
 \usepackage{tikz}
 \usetikzlibrary{patterns,arrows, arrows.meta,calc,decorations.pathmorphing,backgrounds, positioning,fit,automata,shapes,matrix}
-\usetikzlibrary{matrix}
 
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -81,7 +80,7 @@
 \usepackage[edges]{forest}
 \usepackage{csquotes}
 
-\AtBeginDocument{\colorlet{defaultcolor}{.}}
+
 \newcommand{\gray}[1]{\textcolor{cdgray!70}{#1}}
 
 \newcommand{\chart}[3]{\begin{tikzpicture}[line cap=round,line join=round,scale=0.25]
@@ -107,7 +106,7 @@
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{\formatdate{13}{12}{2021}}
+	\date{\formatdate{22}{12}{2021}}
 
 	\maketitle
 
@@ -424,9 +423,9 @@ void topsort(int n, int e, struct Edge edges[], int ord[]) {
 	\textbf{Beobachtung}: Suche läuft ähnlich ab
 	\begin{itemize}
 		\item Operation 1: Lesen des nächsten Knotens \hfill \texttt{READ}
-		\item Operation 2: Löschen des gewählten Knotens \hfill \texttt{REMOVE}
-		\item Operation 3: Hinzufügen eines Nachfolgerknotens \hfill \texttt{INSERT}
-		\item Operation 4: Leerheit der Datenstruktur \hfill \texttt{EMPTY}
+		\item Operation 2: Löschen des gewählten Knotens \hfill \texttt{REMOVE} \\ $\phantom{Operation 2: \enskip}$ \textcolor{cdgray!50}{(und seiner Duplikate)} 
+		\item Operation 3: Hinzufügen der Nachfolgerknoten \hfill \texttt{INSERT}
+		\item Operation 4: Leerheit der Datenstruktur prüfen \hfill \texttt{EMPTY}
 	\end{itemize}
 
 	\pause
@@ -441,9 +440,10 @@ void topsort(int n, int e, struct Edge edges[], int ord[]) {
 	\pause
 	weitere Möglichkeit für \texttt{STORAGE}: \textbf{Prioritätswarteschlange} \\
 	{\scriptsize (vgl. Übung 11, Dijkstra-Algorithmus für kürzeste Wege in gewichteten Graphen)}
+	\vspace{-.5\baselineskip}
 	\begin{itemize}
 		\item Wahl des nächsten Elementes anhand eines Prioritätswertes
-		\item Vorstellung: \textit{geordnete} Warteschlange
+		\item Vorstellung: \textit{\enquote{geordnete}} Warteschlange
 	\end{itemize}
 \end{frame}
 
