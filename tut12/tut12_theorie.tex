@@ -1,0 +1,353 @@
+% This work is licensed under the Creative Commons
+% Attribution-NonCommercial-ShareAlike 4.0 International License. To view a copy
+% of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ or
+% send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+% (c) Eric Kunze, 2019
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Template for lecture notes and exercises at TU Dresden.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[ngerman, a4paper, 12pt]{article}
+
+\usepackage[ngerman]{babel}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{parskip}  	% split paragraphs by vspace instead of intendations
+\usepackage[onehalfspacing]{setspace} % increase row-space
+\usepackage[title,titletoc]{appendix}
+
+\usepackage[utf8]{inputenc}
+\usepackage{chngcntr}
+\usepackage{eufrak}
+
+\usepackage{lmodern}
+\usepackage{ulem} 
+
+\usepackage{fancyhdr} 	% customize header / footer
+\usepackage{tocloft}
+%\renewcommand{\cfttoctitlefont}{\titlefont\Huge\bfseries}
+%\renewcommand{\cftbeforetoctitleskip}{0pt}
+%\renewcommand{\cftchapnumwidth}{2em}
+%\renewcommand{\cftsecindent}{2em}
+%\renewcommand{\cftsecnumwidth}{2em}
+%\renewcommand{\cftsubsecindent}{4em}
+
+% further support for different equation setting
+\usepackage{cancel}
+
+\usepackage[table,dvipsnames]{tudscrcolor}
+\usepackage{tabularx} 	% tabularx-environment (explicitly set width of columns)
+\usepackage{booktabs}	% improved rules
+
+\newcommand{\begriff}[1]{\textbf{#1}}
+\newcommand{\person}[1]{\textsc{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                             COUNTER                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{enumerate}
+\usepackage[inline]{enumitem} 		%customize label
+
+\renewcommand{\labelitemi}{\raisebox{2pt}{\scalebox{.4}{$\blacksquare$}}}
+\renewcommand{\labelitemii}{$\vartriangleright$}
+\renewcommand{\labelitemiii}{--}
+% Variantionen des Dreiecks als Aufzählungszeichen $\blacktriangleright$ / $\vartriangleright$ / $\triangleright$
+
+\renewcommand{\labelenumi}{(\arabic{enumi})}
+\renewcommand{\labelenumii}{\alph{enumii}.}
+\renewcommand{\labelenumiii}{\roman{enumiii}.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{chngcntr}   % modify counters
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              MATH                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amsthm,amssymb,amsfonts,mathtools}
+\usepackage{latexsym}
+\usepackage{marvosym} 	% lightning (contradiction)
+\usepackage{stmaryrd} 	% Lightning symbol
+\usepackage{bbm} 		% unitary matrix
+\usepackage{wasysym}	% add some symbols
+
+\usepackage{../mathoperatorsAuD}
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01}
+
+\newcommand{\satzende}{\enskip \text{.}}
+\newcommand{\komma}{\enskip \text{,}}
+
+\newtheoremstyle{mystyle}% name of the style to be used
+	{6pt}% spaceabove. E.g.: 3pt
+	{6pt}% spacebelow. E.g.: 3pt
+	{\itshape}% bodyfont
+	{}% indent
+	{\bfseries}% headfont
+	{.}% headpunctuation
+	{ }% space after theorem head; " " = normal interword space
+	{}% Manually specify head
+\theoremstyle{mystyle}
+
+\newtheorem{definition}{Definition}
+\newtheorem{beispiel}[definition]{Beispiel}
+\newtheorem{hinweis}[definition]{Hinweis}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           REFERENCES                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[
+type={CC},
+modifier={by-nc-sa},
+version={4.0},
+]{doclicense}
+
+\usepackage[unicode,bookmarks=true]{hyperref}
+\hypersetup{
+%	pdfborder={0 0 0}			% no boxed around links
+%	pdfborderstyle={/S/U/W 1},	% underlining insteas of boxes
+%	linkbordercolor=cdblue,
+%	urlbordercolor=cdblue
+	colorlinks,
+	citecolor=cdpurple,
+	filecolor=cddarkblue!80,
+	linkcolor=cdblue,
+	urlcolor=cdblue
+}
+\usepackage[nameinlink]{cleveref}
+\crefname{beispiel}{Beispiel}{Beispiele}
+
+\usepackage{bookmark}		% pdf-bookmarks
+
+
+
+
+
+
+\begin{document}
+	\title{\bfseries \sffamily \huge Das algebraische Pfadproblem}
+	\author{\scshape Eric Kunze}
+	\date{\today}
+	\maketitle
+	{ \footnotesize \doclicenseThis }
+	
+	\begin{center}
+		\small \slshape Mit dieser Lösung ist keine Garantie auf Vollständigkeit und/oder Korrektheit verbunden!
+	\end{center}
+	
+	\section{Verallgemeinerung und Semiringe}
+	
+	Wir kennen bereits den Floyd-Warshall-Algorithmus zur Berechnung kürzester Wege. Grundlage des dynamischen Verfahrens war die schrittweise Zulassung weiterer Knoten, bis am Ende schließlich alle Knoten des Graphen zugelassen sind und die entstandene Matrix die tatsächliche, gesuchte Distanzmatrix ist. Bei der Zulassung des nächsten Knotens werden die Matrixeinträge mithilfe der Update-Formel 
+	\begin{equation*}
+		D_G^{(k+1)}(u,v)
+		= \min\menge{D_G^{(k)}(u,v) , 
+				D_G^{(k)}(u,k+1) + D_G^{(k)}(k+1,v)}
+	\end{equation*}
+	aktualisiert. In dieser Formel sind im Wesentlichen zwei Operationen beteiligt: die Addition, die die Länge des neuen Alternativweges $u \leadsto k+1 \leadsto v$ berechnet, und das Minimum, mit welchem wir die zwei alternativen Wege beurteilen.
+	
+	Man kann nun diese beiden Operationen geeignet austauschen und andere Problemstellungen lösen. 
+	Dazu betrachten wir eine allgemeine algebraische Strukur: Semiringe.
+	
+	\begin{definition}[Semiring]
+		Ein \textbf{Semiring} ist ein Tupel $(S, \oplus, \odot, \mathbf{0}, \mathbf{1})$ bestehend aus
+		\begin{itemize}
+			\item einer Trägermenge $S$,
+			\item einer binären Operation $\oplus$ (Akkumulationsoperation) mit neutralem Element $\mathbf{0}$ und
+			\item einer binären Operation $\odot$ (Pfadoperation) mit neuralem Element $\mathbf{1}$.
+		\end{itemize}
+		Weiterhin fordern wir folgende Eigenschaften:
+		\begin{itemize}
+			\item $\oplus$ ist assoziativ und kommutativ,
+			\item $\odot$ ist assoziativ,
+			\item $\odot$ ist distributiv über $\oplus$, d.h. $a \odot (b \oplus c) = (a \odot b) \oplus (a \odot c)$, und
+			\item $\mathbf{0}$ ist ein Annihilator für $\odot$, d.h. $a \odot \mathbf{0} = \mathbf{0}$.
+		\end{itemize}
+		Ein Semiring heißt \textbf{idempotent}, falls $s \oplus s = s$ für alle $s \in S$ gilt.
+	\end{definition}
+
+	Die eigentliche Definition eines Semirings ist für uns nicht weiter relevant, sie sichert lediglich, dass alles so funktioniert, wie wir es uns wünschen. Viel bedeutender sind die konkreten Problemstellungen.
+	
+	\begin{beispiel}[Kürzeste-Wege-Problem]
+		\label{bsp: kuerzeste-wege-problem}
+		Für das Kürzeste-Wege-Problem haben wir uns die Bedeutung der Operationen oben schon überlegt. Wir wählen also den sogenannten tropischen Semiring
+		\begin{equation}
+			(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = (\R_{\ge 0}^\infty, \min, +, \infty, 0) \satzende
+			\tag{tropischer Semiring}
+		\end{equation}
+	\end{beispiel}
+	
+	\begin{beispiel}[Kapazitätsproblem] 
+		\label{bsp: kapazitaetsproblem}
+		Die Kanten unserer Graphen seien (Einbahn-)Straßen mit maximalen Belastungsgewichten. Nun ist die Frage, wieviel ein Lkw maximal wiegen darf, um zwischen zwei Knoten verkehren verkehren zu dürfen?
+		Entlang eines Pfades ist die maximale Belastung durch den Abschnitt bestimmt, der am wenigsten Gewicht trägt -- also die \textit{minimale} Belastung einer Kante. Von zwei Pfaden wählen wir denjenigen, der mehr Belastung zulässt -- also das  \textit{Maximum} der beiden Pfade.
+		Nehmen wir nun noch an, dass alle Gewichte natürliche Zahlen oder $\infty$ sind, dann erhalten wir den Semiring
+		\begin{equation}
+			(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = (\N_\infty, \max, \min, 0, \infty) \satzende
+			\tag{Kapzitätsproblem}
+		\end{equation}
+	\end{beispiel}
+
+	\begin{beispiel}[Zuverlässigkeitsproblem] 
+		\label{bsp: zuverlaessigkeitsproblem}
+		Die Gewichte an den Kanten sind Wahrscheinlichkeiten $p \in [0,1]$, wie zuverlässig ein Fahrzeug zwischen zwei Knoten verkehrt. Entlang eines Pfades multiplizieren wir die Wahrscheinlichkeiten um die Gesamtwahrscheinlichkeit vom Start des Pfades zum Ende des Pfades zu gelangen. Von zwei Pfaden wählen wir erneut denjenigen mit größerer Gesamtwahrscheinlichkeit. Der sogenannte Viterbi-Semiring ist damit gegeben durch
+		\begin{equation}
+			(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = ([0,1], \max, *, 0, 1) \satzende
+			\tag{Viterbi-Semiring}
+		\end{equation}
+	\end{beispiel}
+
+	Ein weiteres, einfacheres Problem ist das \textbf{Erreichbarkeitsproblem} mit $(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = ([0,1], \max, *, 0, 1)$. Das letzte für uns relevante, jedoch deutlich komplizierte Problem, für das die Ausführungen hier nicht mehr alle richtig sind, ist das \textbf{Prozessproblem}, welches mit formalen Sprachen arbeitet.
+	
+	Die Verallgemeinerung des Kürzesten-Wege-Problems auf allgemeine Semiringe wird \textbf{algebraisches Pfadproblem} genannt. Der zugehörige Algorithmus heißt Aho-Hopcraft-Ullman-Algorithmus. Dieser arbeit jedoch sehr ähnlich zum Floyd-Warshall-Algorithmus.
+	
+	
+	\section{Der Aho-Hopcraft-Ullman-Algorithmus}
+	
+	Betrachten wir einen allgemeinen Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1})$ mit einer Trägermenge $S$, einer Pfadoperation $\odot$ mit neutralem Element $\mathbf{1}$ sowie einer Akkumulationsoperation $\oplus$ mit neutralem Element $\mathbf{0}$. 
+	
+	Auch der Aho-Hopcraft-Ullman-Algorithmus arbeitet mit Approximationen $D_G^{(k)}$ durch schrittweise Zulassung von mehr inneren Knoten. Wir starten erneut mit der modifizierten Adjazenzmatrix, jedoch ist die Modifikation nun ein wenig anders.
+	Für \textit{verschiedene} Knoten $u, v \in V$, für die eine Kante von $u$ nach $v$ existiert, nutzen wir dieses Kantengewicht (wie in jeder Adjazenzmatrix). Existiert keine Kante von $u$ nach $v$, so nutzen wir nicht mehr unbedingt $\infty$, weil es nicht notwendigerweise um echte Entfernungen geht. Im Beispiel des Kapazitätsproblems müssen wir uns fragen, wieviel Gewicht über eine Straße fahren darf, damit diese Straße nicht benutzbar ist -- hier ist die Antwort $0$. Wir verwenden also im allgemeinen Semiring stets $\mathbf{0}$, das neutrale Element von $\oplus$.
+	Für einen Knoten $v \in V$ können wir immer durch \enquote{Stehenbleiben} den besten Weg finden und setzen daher diesen Wert daher auf $\mathbf{1}$. Zusammengefasst ist
+	\begin{equation*}
+		mA_G = \begin{cases}
+			A_G(u,v) & \text{wenn } u \neq v \\
+			A_G(u,v) \oplus \mathbf{1} & \text{wenn } u = v
+		\end{cases}
+	\end{equation*}
+	und $D_G^{(0)} = mA_G$.
+	
+	Die Update-Formel im Aho-Hopcraft-Ullman-Algorithmus sieht wie folgt aus:
+	\begin{equation*}
+		D_G^{(k+1)}(u,v) 
+		= D_G^{(k)}(u,v) \oplus \brackets{D_G^{(k)}(u,k+1) \odot (D_G^{(k)}(k+1,k+1))^\ast \odot D_G^{(k)}(k+1,v)} \satzende
+	\end{equation*}
+	Im Vergleich zum Floyd-Warshall-Algorithmus enthält sie damit einen \enquote{Faktor} mehr -- nämlich $(D_G^{(k)}(k+1,k+1))^\ast$.
+	
+	Dieser ist jedoch für viele praktische Problemstellungen, die wir betrachten, zu vernachlässigen.Wir werden in \cref{sec: vereinfachung} begründen, wieso das der Fall ist. 
+	
+	\section{Ein bisschen Abstraktes}
+	
+	Dafür benötigen wir zunächst einmal ein tieferes Verständnis über die Verallgemeinerungen, die wir gemacht haben, wenn wir über Semiringe sprechen.
+
+	Manchmal benötigt man viele Operationen hintereinander. Für die gewöhnliche Addition kennt man daher das Summenzeichen $\sum$, um z.B. $\sum_{i=0}^n i = 0 + 1 + 2 + \dots + n$ abzukürzen. Man kann auch die Indexmenge, die $i$ durchläuft unten an das Summenzeichen schreiben, d.h.
+	\begin{equation*}
+		\sum_{i=0}^n i = \sum_{i \in \menge{0, \dots, n}} i.
+	\end{equation*}
+	
+	Diese Prozedur kann man auch für andere Operationen machen, z.B. für 
+	\begin{equation*}
+		s_0 \oplus s_1 \oplus s_2 \oplus s_3 \oplus \dots  \oplus s_n
+	\end{equation*}
+	wäre eine abkürzende Schreibweise wünschenswert. Wir nutzen wieder das Summenzeichen und müssen aber die Operation, die verallgemeinert werden soll (hier: $\oplus$), mit notieren. Daraus ergibt sich
+	\begin{equation*}
+		\sideset{}{^\oplus}\sum_{i \in \menge{0, \dots, n}} s_i \defeq s_0 \oplus s_1 \oplus s_2 \oplus s_3 \oplus \dots  \oplus s_n
+		\satzende
+	\end{equation*}
+
+	\begin{beispiel}
+		Für das Kürzeste-Wege-Problem ist $\oplus = \min$ und daher
+		\begin{equation*}
+			\sideset{}{^\oplus}\sum_{i \in \menge{5, 6, \dots, 10}} i
+			 = \sideset{}{^{\min}}\sum_{i \in \menge{5, 6, \dots, 10}} i
+			= \min\menge{5, 6, 7, 8, 8, 10} = 5
+			\satzende
+		\end{equation*}
+		Für das Kapazitätsproblem dagegen ist $\oplus = \max$ und somit
+		\begin{equation*}
+			\sideset{}{^\oplus}\sum_{i \in \menge{5, 6, \dots, 10}} i
+			= \sideset{}{^{\max}}\sum_{i \in \menge{5, 6, \dots, 10}} i
+			= \max\menge{5, 6, 7, 8, 8, 10} = 10
+			\satzende
+		\end{equation*}
+	\end{beispiel}
+	
+	Formal kann man $\sideset{}{^\oplus}\sum$ als Abbildung auffassen, die \textit{vielen} Elementen ein Ergebnis zuordnet, während $\oplus$ immer \textit{genau zwei} Elementen ein Ergebnis zuordnet. Stellt man an $\sideset{}{^\oplus}\sum$ nun noch weitere Anforderungen, auf die wir hier nicht näher eingehen wollen, und nennt sie dann vollständig, dann kann man das algebraische Pfadproblem genau definieren.
+	
+	\begin{definition}
+		Das algebraische Pfadproblem auf einem $\sideset{}{^\oplus}\sum$-vollständigen, idempotenten Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1})$ besteht in der Berechnung von 
+		\begin{equation*}
+			D_G(u,v) = \sideset{}{^\oplus}\sum_{p \in P_{u,v}} c(p)
+		\end{equation*}
+	\end{definition}
+
+	\begin{hinweis}
+		Manche Autoren verwenden statt $\sideset{}{^\oplus}\sum$ auch die Notation eines großen $\oplus$, also
+		\begin{equation*}
+			s_0 \oplus s_1 \oplus \dots  \oplus s_n = \sideset{}{^\oplus}\sum_{i \in \menge{0, 1, \dots, n}} s_i = \bigoplus_{i \in \menge{0, \dots, n}} s_i = \bigoplus_{i=0}^n s_i.
+		\end{equation*}
+	\end{hinweis}
+
+
+	Für ein Element $s \in S$ in einem Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1})$ können wir allgemein eine \enquote{Potenz} definieren. 
+	
+	\begin{definition} \label{def: potenz}
+		Für ein $s \in S$ ist $s^n$ induktiv definiert durch 
+		\begin{equation*}
+			s^0 \defeq \mathbf{1} \qquad \text{ und } \qquad s^{n+1} \defeq s \odot s^n \enskip \text{ für alle } n \in \N
+			\satzende
+		\end{equation*} 
+	\end{definition}
+	
+	Zum Schluss kann man noch so etwas wie einen \enquote{Abschluss der Potenz} definieren, den \textbf{Stern}. Die Definition ist analog zu der des Kleene-Sterns für Formale Sprachen. 
+	
+	\begin{definition} \label{def: stern}
+		Für ein $s \in S$ ist der \textbf{Stern} $s^\ast$ definiert als
+		\begin{equation*}
+			s^\ast \defeq \sideset{}{^\oplus}\sum_{n \in \N} s^n
+			\satzende
+		\end{equation*}
+	\end{definition}
+	
+	\begin{hinweis}
+		Ist $S$ die Menge aller Sprachen, $s \in S$ also eine Sprache, $\odot$ die Konkatenation von Wörtern und $\oplus = \cup$ die Vereinigung von Mengen bzw. Sprachen, so ergibt sich
+		\begin{equation*}
+			s^\ast = \sideset{}{^\cup}\sum_{n \in \N} s^n
+			= \bigcup_{n \in \N} s^n
+			\satzende
+		\end{equation*}
+		Ersetzt man $s$ durch $L$ so erkennt man genau die Definition des Kleene-Sterns für formale Sprachen. 
+	\end{hinweis}
+	
+	\section{Eine wesentliche Vereinfachung}
+	\label{sec: vereinfachung}
+	
+	Die Update-Formel des Aho-Hopcraft-Ullman-Algorithmus enthält den zusätzlichen \enquote{Faktor} $D_G^{(k)}(k+1, k+1)^\ast$. Bei allen unseren praktischen Problemen -- \textit{außer dem Prozessproblem} -- fällt dieser Teil nämlich weg. Wieso dies so ist, wollen wir hier begründen, indem wir zeigen, dass stets 
+	$s^\ast = \mathbf{1}$ für alle $s \in S$.
+	
+	Wir vollführen das Ganze anhand des Kapazitätsproblems aus \cref{bsp: kapazitaetsproblem} und fixieren daher den Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = (\N_\infty, \max, \min, 0, \infty)$.
+	
+	Gemäß \cref{def: stern} gilt $s^\ast = \sideset{}{^\oplus}\sum_{n \in \N} s^n$ mit $s^0 = \mathbf{1}$ und $s^{n+1} = s \odot s^n$. 
+	Im unserem Semiring gilt nach \cref{def: potenz} für die Potenzen:
+	\begin{itemize}
+		\item $s^0 = \mathbf{1} = \infty$
+		\item $s^1 = s \odot s^0 = \min \menge{s, \infty} = s$
+		\item $s^2 = s \odot s^1 = \min \menge{s, s} = s$
+		\item ...
+	\end{itemize}
+	Man kann nun mittels vollständiger Induktion noch zeigen, dass stets $s^n = s$ für alle $n \ge 1$.
+	
+	Schließlich ist
+	\begin{equation*}
+		s^\ast = \sideset{}{^\oplus}\sum_{n \in \N} s^n 
+		= \sideset{}{^{\max}}\sum_{n \in \N} s^n 
+		= \sup \menge{s^n : n \in \N} = \sup \menge{\infty , s, s, \dots} 
+		= \infty 
+		= \mathbf{1} \satzende
+	\end{equation*}
+	
+	Somit gilt dann in der Updateformel 
+	\begin{equation*}
+		\begin{aligned}
+			D_G^{(k+1)}(u,v) &= \max \menge{D_G^{(k)}(u,v) , \min\menge{D_G^{(k)}(u,k+1) , \infty, D_G^{(k)}(k+1,v)}} \\
+			&=	\max \menge{D_G^{(k)}(u,v) , \min\menge{D_G^{(k)}(u,k+1), \phantom{\infty, } D_G^{(k)}(k+1,v)}} \\
+			&= 	D_G^{(k)}(u,v) \oplus \brackets{D_G^{(k)}(u,k+1) \odot D_G^{(k)}(k+1,v)} 
+			\satzende
+		\end{aligned}
+	\end{equation*}
+
+	So wie wir diese Eigenschaft hier für das Kapazitätsproblem gezeigt haben, kann man für alle weiteren Probleme (außer dem Prozessproblem) verfahren. Insbesondere kann man damit auch zeigen, dass der Floyd-Warshall-Algorithmus für kürzeste Wege wirklich ein Spezialfall des Aho-Hopcraft-Ullman-Algorithmus ist.
+
+	
+\end{document}
+
