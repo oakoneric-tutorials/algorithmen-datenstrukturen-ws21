@@ -19,8 +19,10 @@
 \usepgfplotslibrary{fillbetween}
 \usepackage{pgf}
 \usepackage{tikz}
-\usetikzlibrary{patterns,arrows, arrows.meta,calc,decorations.pathmorphing,backgrounds, positioning,fit,petri,decorations.fractals}
-\usetikzlibrary{matrix}
+\usetikzlibrary{patterns,arrows, arrows.meta,calc,decorations.pathmorphing,backgrounds, positioning,fit,automata,shapes,matrix}
+\tikzset{onslide/.code args={<#1>#2}{%
+		\only<#1| handout:1>{\pgfkeysalso{#2}} 
+}}
 
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -64,13 +66,13 @@
 
 \begin{document}
 	\title{Algorithmen und Datenstrukturen}
-	\subtitle{Übung 11: Graphensuche \& Floyd-Warshall-Algorithmus}
+	\subtitle{Übung 11: Kürzeste Wege}
 	\author{Eric Kunze}
-	\email{eric.kunze@mailbox.tu-dresden.de}
+	\email{eric.kunze@tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{22.01.2021}
+	\date{\formatdate{20}{12}{2021}}
 
 	\maketitle
 
@@ -81,120 +83,211 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Breiten- und Tiefensuche}
+\section{Dijkstra-Algorihtmus}
 
 \begin{frame}[t] \frametitle{Suchverfahren}
+	\small	
+	\begin{minipage}[t]{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\textbf{Tiefensuche:}
+		\begin{itemize}
+			\item gehe in die Tiefe: \\
+			\enquote{entdecke erst Kinder, dann Geschwister}
+			\item Nachfolger werden \emph{oben} auf den Keller gelegt
+			\item nächster Knoten wird \emph{oben} vom Keller genommen
+		\end{itemize}
+		
+		\bigskip 
+		
+		\textbf{Keller:}
+		\begin{center}
+			\scalebox{0.5}{%
+			\begin{tikzpicture}[scale=0.5]
+				\draw[thick] (-1,-1) -- (3,-1);
+				\foreach \y in {0,...,5}
+				\draw (0,\y) rectangle ++(2,-1);
+				\node[anchor=north east] (nachfolger) at (-3,5) {Nachfolger};
+				\draw[->, arrows=-Stealth, bend angle=45, bend left]  (nachfolger) to (1,5);
+				\node[anchor=south west] (next) at (4,4) {nächster Knoten};
+				\draw[->, arrows=-Stealth]  (2,4.5) to (next);
+			\end{tikzpicture}}
+		\end{center}
+	\end{minipage}
+	\begin{minipage}[t]{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\textbf{Breitensuche:}
+		\begin{itemize}
+			\item gehe in die Breite: \\
+			\enquote{entdecke erst Geschwister, dann Kinder}
+			\item Nachfolger stellen sich \emph{hinten} an
+			\item nächster Knoten wird von \emph{vorn} genommen
+		\end{itemize}
+		
+		\bigskip 
+		
+		\textbf{Warteschlange:}
+		\begin{center}
+			\scalebox{0.4}{%
+			\begin{tikzpicture}
+				\foreach \x in {0,...,5}
+				\draw[color=defaultcolor] (\x,0) rectangle ++(1,1);
+				\node[anchor=south west] (nachfolger) at (9,1) {Nachfolger};
+				\draw[->, arrows=-Stealth, bend angle=45, bend right]  (nachfolger.west) to (6.5,1);
+				\node[anchor=north] (next) at (-1.5,-1) {nächster Knoten};
+				\draw[->, arrows=-Stealth, bend angle=45, bend right]  (0,0.5) to (next.north);
+			\end{tikzpicture}}
+		\end{center}
+	\end{minipage}
+\end{frame}
+
+\begin{frame} \frametitle{Verallgemeinerte Graphensuche}
+	\small
+	\textbf{Beobachtung}: Suche läuft ähnlich ab
 	\begin{itemize}
-		\item Ziel: Finden eines Knotens mit bestimmter Beschriftung in einem Graphen
-		\item hier: uninformierte Suche mit Tiefen- und Breitensuche
+		\item Operation 1: Lesen des nächsten Knotens \hfill \texttt{READ}
+		\item Operation 2: Löschen des gewählten Knotens \hfill \texttt{REMOVE} \\ $\phantom{Operation 2: \enskip}$ \textcolor{cdgray!50}{(und seiner Duplikate)} 
+		\item Operation 3: Hinzufügen der Nachfolgerknoten \hfill \texttt{INSERT}
+		\item Operation 4: Leerheit der Datenstruktur prüfen \hfill \texttt{EMPTY}
+	\end{itemize}
+	
+	\pause
+	\begin{center}
+		\begin{tabular}{l|ccccc}
+			& \texttt{STORAGE} & \texttt{READ} & \texttt{REMOVE} & \texttt{INSERT} & \texttt{EMPTY} \\ \hline
+			Tiefensuche & Keller & \texttt{top} & \texttt{pop} & \texttt{push} & \texttt{empty} \\
+			Breitensuche & Queue & \texttt{head} & \texttt{dequeue} & \texttt{enqueue} & \texttt{nil} \\
+		\end{tabular}
+	\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Graphensuche mit Prioritätswarteschlange}
+	\small
+	weitere Möglichkeit für \texttt{STORAGE}: \textbf{Prioritätswarteschlange}
+	\begin{itemize}
+		\item \texttt{READ} -- Auswahl des nächsten Knotens mit minimaler Priorität 
+		\item \texttt{REMOVE} -- as usual
+		\item \texttt{INSERT} -- Nachfolger stellt sich entsprechend seiner Priorität in die Warteschlange \\ (oder Prioritätswert erhält ein Update, wenn er bereits in der Warteschlange steht)
 	\end{itemize}
 
-	\bigskip 
-	
-	\begin{center}
-		\begin{tikzpicture}
-			\node [circle,draw] (1) at (-1.33,0)  {$1$};
-			\node [circle,draw] (2) at (0,1)  {$2$};
-			\node [circle,draw] (3) at (0,0) {$3$};
-			\node [circle,draw] (4) at (0,-1) {$4$};
-			
-			\node [circle,draw] (5) at (1.33,0)  {$5$};
-			
-			\node [circle,draw] (6) at (2.66,1)  {$6$};
-			\node [circle,draw] (7) at (2.66,0)  {$7$};
-			\node [circle,draw] (8) at (2.66,-1) {$8$};
-			
-			% Kanten
-			% \path (1) -- node[weight] {$3$} (3)
-			\draw (1) -- (2);
-			\draw (1) -- (3);
-			\draw (1) -- (4);
-			
-			\draw (2) -- (5);
-			\draw (3) -- (5);
-			\draw (4) -- (5);
-			\draw (5) -- (6);
-			\draw (6) -- (7);
-			\draw (7) -- (8);
-			\draw (5) -- (8);
-		\end{tikzpicture}
-	\end{center}
-	
+	\textbf{Vorstellung}: \textit{\enquote{geordnete}} Warteschlange
 \end{frame}
 
-\begin{frame}[t] \frametitle{Tiefensuche}
-    \begin{itemize}
-    	\item gehe in die Tiefe: \enquote{entdecke erst Kinder, dann Geschwister}
-    	\item Datenstruktur: Keller
-    	\item Nachfolger werden \emph{oben} auf den Keller gelegt
-    	\item nächster Knoten wird \emph{oben} vom Keller genommen
-    \end{itemize}
-	
-	\bigskip 
-	
-	\textbf{Keller:}
-	\begin{center}
-		\begin{tikzpicture}[scale=0.5]
-			\foreach \y in {0,...,5}
-				\draw[color=cddarkblue] (0,\y) rectangle ++(2,-1);
-			\node[anchor=north east] (nachfolger) at (-3,5) {Nachfolger};
-			\draw[->, arrows=-Stealth, bend angle=45, bend left]  (nachfolger) to (1,5);
-			\node[anchor=south west] (next) at (4,4) {nächster Knoten};
-			\draw[->, arrows=-Stealth]  (2,4.5) to (next);
-		\end{tikzpicture}
-	\end{center}
-\end{frame}
+\begin{frame} \frametitle{Dijkstra-Algorithmus}
+	\small
+	Graphensuche mit Prioritätswarteschlange:
+	\begin{equation*}
+		\text{Priotrität} = \text{Priorität des Vorgängers} + \text{Kantengewicht}
+	\end{equation*}
 
-\begin{frame}[t] \frametitle{Breitensuche}
-    \begin{itemize}
-    	\item gehe in die Breite: \enquote{entdecke erst Geschwister, dann Kinder}
-    	\item Datenstruktur: Warteschlange
-    	\item Nachfolger werden \emph{hinten} stellen sich \emph{hinten} an
-    	\item nächster Knoten wird von \emph{vorn} genommen
-    \end{itemize}
-
-	\bigskip 
+	\pause
 	
-	\textbf{Warteschlange:}
+	\textbf{Beispiel}:
 	\begin{center}
-		\begin{tikzpicture}[scale=0.5]
-			\foreach \x in {0,...,5}
-			\draw[color=cddarkblue] (\x,0) rectangle ++(1,1);
-			\node[anchor=south west] (nachfolger) at (9,1) {Nachfolger};
-			\draw[->, arrows=-Stealth, bend angle=45, bend right]  (nachfolger.west) to (6.5,1);
-			\node[anchor=north] (next) at (-1.5,-1) {nächster Knoten};
-			\draw[->, arrows=-Stealth, bend angle=45, bend right]  (0,0.5) to (next.north);
-		\end{tikzpicture}
+		\scalebox{0.6}{%
+			\begin{tikzpicture}[->, 
+				>=stealth', 
+				initial text=, 
+%					node distance=3cm, 
+				bend angle=20, 
+				semithick,
+				elliptic state/.style={draw,ellipse},
+				chosen/.style={ultra thick, fill=cdorange!40},
+				done/.style={fill=defaultcolor!10}
+				]%[node distance=2cm,auto]
+				
+				\node[elliptic state, accepting, onslide={<3>{chosen}}, onslide={<4->{done}}] (dd) {Dresden}; 
+				\node[elliptic state, onslide={<7>{chosen}}, onslide={<8->{done}}] (pd) [above right = 1cm and 1cm of dd] {Potsdam}; 
+				\node[elliptic state, onslide={<5>{chosen}}, onslide={<6->{done}}] (le) [right = 2cm of dd] {Leipzig};
+				\node[elliptic state, onslide={<9>{chosen}}, onslide={<10->{done}}] (be) [right = 2cm of pd] {Berlin};
+				
+				\tikzset{every node/.style = {font=\footnotesize, color=cdblue}};
+				\path[->]
+				(dd) edge node[above left] {160km} (pd) 
+				(dd) edge node[above] {100km} (le)
+				(pd) edge node[above] {30km} (be)
+				(le) edge node[below right] {150km} (be);
+		\end{tikzpicture}}
 	\end{center}
+
+	Wir notieren Knoten in der Form $(\text{Knoten}, \text{Priorität}, \text{Vorgänger})$.
+	
+	\scalebox{0.7}{%
+	\renewcommand{\arraystretch}{1.4}
+	\begin{tabular}{l|l}
+		\hline
+		gewählter Knoten & Warteschlange \\ \hline\hline
+		\onslide<3->{(Dresden, 0 km, --)} & \onslide<4->{\alert<5>{(Leipzig, 0 + 100 km, Dresden)}, (Potsdam, 0 + 160 km, Dresden)} \\ \hline
+		\onslide<5->{(Leipzig, 100 km, Dresden)} & \onslide<6->{\alert<7>{(Potsdam, 160 km, Dresden)}, (Berlin, 100 + 150 km, Leipzig)} \\ \hline
+		\onslide<7->{(Potsdam, 160 km, Dresden)} & \onslide<8->{\alert<9>{(Berlin, 160 + 30 km, Potsdam)}} \\ \hline
+		\onslide<9->{(Berlin, 190 km, Potsdam)} & \onslide<10->{---} \\ \hline
+	\end{tabular}}
 \end{frame}
 
 \begin{frame} \frametitle{Aufgabe 1}
-	\centering
+	\small
 	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
-		\includegraphics[height=15em]{./tut11_task2-graph.pdf}
-	\end{minipage}
+		\begin{center}
+			\scalebox{0.7}{%
+				\begin{tikzpicture}[->, 
+					>=stealth', 
+					initial text=, 
+					%					node distance=3cm, 
+					semithick,
+					chosen/.style={ultra thick, fill=cdorange!40},
+					done/.style={fill=defaultcolor!10}
+					]
+					
+					\node[state, onslide={<3>{chosen}}, onslide={<4->{done}}] (1) {$1$}; 
+					\node[state, onslide={<9>{chosen}}, onslide={<10->{done}}] (2) [above left = 1cm and 2cm of 1] {$2$}; 
+					\node[state, onslide={<5>{chosen}}, onslide={<6->{done}}] (3) [above = 2cm of 1] {$3$};
+					\node[state, onslide={<7>{chosen}}, onslide={<8->{done}}] (4) [above right = 1cm and 2cm of 1] {$4$};
+					\node[state, onslide={<11>{chosen}}, onslide={<12->{done}}] (5) [below left = 1cm and 2cm of 1] {$5$};
+					\node[state, onslide={<13>{chosen}}, onslide={<14->{done}}] (6) [below right = 1cm and 2cm of 1] {$6$};
+					
+					\tikzset{every node/.style = {font=\footnotesize, color=cdblue}};
+					\path[->]
+					(1) edge node[above left] {$10$} (4) 
+					(1) edge node[above left] {$15$} (5)
+					(1) edge node[left] {$3$} (3)
+					(2) edge node[left] {$4$} (5)
+					(3) edge node[above left] {$6$} (2)
+					(3) edge node[above right] {$5$} (4)
+					(4) edge node[right] {$6$} (6)
+					(5) edge node[above] {$2$} (6);
+			\end{tikzpicture}}
+		\end{center}
+	\end{minipage} \pause
 	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
-		\begin{itemize}
-			\item[(a)] \textbf{Tiefensuche}: \\ 3 verschiedene depth-first trees 
-			\item[(b)] \textbf{Breitensuche}: \\ 3 verschiedene breadth-first trees
-		\end{itemize}
+		\scalebox{0.7}{%
+			\begin{tabular}{l|l}
+				\hline
+				gewählter Knoten & Randknotenmenge \\ \hline\hline
+				\onslide<3->{$(1, 0, --)$} & \onslide<4->{\alert<5>{$(3, 3, 1)$}, $(4, 10, 1)$, $(5, 15, 1)$} \\ \hline
+				\onslide<5->{$(3, 3, 1)$} & \onslide<6->{$(2, 9, 3)$, \alert<7>{$(4, 8, 3)$}, $(5, 15, 1)$} \\ \hline
+				\onslide<7->{$(4, 8, 3)$} & \onslide<8->{\alert<9>{$(2, 9, 3)$}, $(5, 15, 1)$, $(6, 14, 4)$} \\ \hline
+				\onslide<9->{$(2, 9, 3)$} & \onslide<10->{\alert<11>{$(5, 13, 2)$}, $(6, 14, 4)$} \\ \hline
+				\onslide<11->{$(5, 13, 2)$} & \onslide<12->{\alert<13>{$(6, 14, 4)$}} \\ \hline
+				\onslide<13->{$(6, 14, 4)$} & \onslide<14->{---} \\ \hline
+		\end{tabular}}
+	
+		\bigskip
+		
+		\onslide<15->{%
+			\textbf{Pfadtabelle}:
+			\medskip
+			
+			\scalebox{0.7}{%
+				%			\renewcommand{\arraystretch}{1.4}
+				\begin{tabular}{c|c|l}
+					\hline
+					Zielknoten & Pfadlänge & kürzester Pfad \\ \hline\hline
+					$1$ & $0$ & $1$ \\ \hline
+					$2$ & $9$ & $1, 3, 2$ \\ \hline
+					$3$ & $3$ & $1, 3$ \\ \hline
+					$4$ & $8$ & $1, 3, 4$ \\ \hline
+					$5$ & $13$ & $1, 3, 2, 5$ \\ \hline
+					$6$ & $13$ & $1, 3, 4, 6$ \\ \hline
+			\end{tabular}}
+		}
 	\end{minipage}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
-    \textbf{Tiefensuche}
-
-	Es gibt $5$ verschiedene depth-first-trees, z.B.:
-
-	\includegraphics[width=\linewidth]{./tut11_task2-dft.pdf}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
-    \textbf{Breitensuche}
-
-	Es gibt $5$ verschiedene breadth-first-trees, z.B.:
-
-	\includegraphics[width=\linewidth]{./tut11_task2-bft.pdf}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -202,20 +295,24 @@
 \section{Floyd-Warshall-Algorithmus}
 
 \begin{frame} \frametitle{Floyd-Warshall-Algorithmus}
+	\small
 	\begin{itemize}
 		\item gewichteter Graph $G = (V,E,c)$ mit Weglängen $c$ und ohne Schlingen
 		\item \textbf{Ziel}: kürzeste Wege von beliebigem Startknoten zu beliebigem Zielknoten
 		\item oBdA: $V = \menge{1, \dots, n}$
+		\pause
 		\item $P_{u,v} =$ Menge aller Wege von $u$ nach $v$
 		\item $D_G (u,v) = \begin{cases}
 		\min\menge{c_p : p \in P_{u,v}} & \text{wenn } P_{u,v} \neq \emptyset \\
 		\infty & \text{sonst}
 		\end{cases}$
+		\pause
 		\item $P^{(k)}_{u,v} =$ Menge aller Wege von $u$ nach $v$, deren innere Knoten in $\menge{1, \dots, k}$ liegen
 		\item $D_G^{(k)} (u,v) = \begin{cases}
 		\min\menge{c_p : p \in P_{u,v}^{(k)}} & \text{wenn } P_{u,v}^{(k)} \neq \emptyset \\
 		\infty & \text{sonst}
 		\end{cases}$
+		\pause
 		\item Es gilt $P^{(n)}_{u,v} = P_{u,v}$ und somit $D_G^{(n)} = D_G$.
 	\end{itemize}
 \end{frame}
@@ -234,9 +331,45 @@
 		\end{equation*}
 	\end{itemize}
 \end{frame}
-\begin{frame} \frametitle{Aufgabe 2}
+\begin{frame} \frametitle{Aufgabe 2 \onslide<2->{--- Teil (a)}}
 	\begin{minipage}{\dimexpr0.42\linewidth-\fboxrule-\fboxsep}
-		\includegraphics[height=13em]{./tut11_task3-graph.pdf}
+		\begin{center}
+			\scalebox{0.9}{%
+				\begin{tikzpicture}[->, 
+					>=stealth', 
+					initial text=, 
+					%					node distance=3cm, 
+					semithick,
+					chosen/.style={ultra thick, fill=cdorange!40},
+					done/.style={fill=defaultcolor!10}
+					]
+					
+					\node[state] (4) {$4$}; 
+					\node[state] (1) [above left = 1cm and 1cm of 4] {$1$};
+					\node[state] (3) [above = 2cm of 4] {$3$};
+					\node[state] (6) [above right = 1cm and 1cm of 4] {$6$};
+					\node[state] (2) [below left = 1cm and 1cm of 4] {$2$};
+					\node[state] (5) [below = 2cm of 4] {$5$};
+					\node[state] (7) [below right = 1cm and 1cm of 4] {$7$};
+					
+					\tikzset{every node/.style = {font=\footnotesize, color=cdblue}};
+					
+					% Kanten
+					\path[->] 
+						(1) edge node[above left]{$3$} (3)
+						(2) edge node[left] {$8$} (1)
+						(2) edge node[above left]{$2$} (4)
+						(4) edge node[left] {$8$} (3)
+						(4) edge node[above right]{$4$} (1)
+						(4) edge node[above left]{$3$} (6)
+						(4) edge node[above right]{$6$} (7)
+						(5) edge node[below left]{$4$} (2)
+						(5) edge node[left] {$7$} (4)
+						(5) edge node[below right]{$15$} (7)
+						(6) edge node[above right]{$3$} (3)
+						(6) edge node[right] {$2$} (7);
+			\end{tikzpicture}}
+		\end{center}
 	\end{minipage}
 	\pause
 	\begin{minipage}{\dimexpr0.58\linewidth-\fboxrule-\fboxsep}
