@@ -7,13 +7,6 @@
 \usepackage{wasysym}
 \usepackage{stmaryrd}
 \usepackage{enumerate}
-%\usepackage[inline]{enumitem} 		%customize label
-%\newcommand{\labelitemi}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
-%\newcommand{\labelitemii}{$\vartriangleright$}
-%\newcommand{\labelitemiii}{--}
-\setbeamertemplate{itemize item}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
-\setbeamertemplate{itemize subitem}{$\vartriangleright$}
-
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{tabu}
@@ -23,6 +16,12 @@
 \usepackage{multirow}
 
 \usepackage{cancel}
+
+\usepackage{tikz}
+\usetikzlibrary{patterns,arrows, arrows.meta,calc,decorations.pathmorphing,backgrounds, positioning,fit,automata,shapes,matrix}
+\tikzset{onslide/.code args={<#1>#2}{%
+		\only<#1| handout:1>{\pgfkeysalso{#2}} 
+}}
 
 \usepackage{empheq}
 \newcommand*\widefbox[1]{\fbox{\hspace{2em} #1 \hspace{2em}}}
@@ -44,16 +43,18 @@
 \DeclareMathOperator{\true}{true}
 \DeclareMathOperator{\false}{false}
 
+\usepackage{csquotes}
+
 
 \begin{document}	
 	\title{Algorithmen und Datenstrukturen}
 	\subtitle{Übung 12: Aho-Hopcraft-Ullmann-Algorithmus}
 	\author{Eric Kunze}
-	\email{eric.kunze@mailbox.tu-dresden.de}
+	\email{eric.kunze@tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{29.01.2021}
+	\date{\formatdate{10}{01}{2022}}
 
 	\maketitle
 
@@ -62,23 +63,27 @@
 \section{Algebraisches Pfadproblem}
 
 \begin{frame} \frametitle{Floyd-Warshall-Algorithmus}
-	\small
+	\footnotesize
+	\textbf{Ziel}: kürzeste Wege in einem Graphen $G=(V,E,c)$
 	\begin{itemize}
-		\item \textbf{Ziel}: kürzeste Wege in Graphem $G=(V,E,c)$
-		\item $P^{(k)}_{u,v} =$ Menge aller Wege von $u$ nach $v$, deren innere Knoten in $\menge{1, \dots, k}$ liegen
+		\item $P^{(k)}_{u,v} =$ Menge aller Wege von $u$ nach $v$ mit inneren Knoten in $\menge{1, \dots, k}$
 		\item $D_G^{(k)} (u,v) = \begin{cases}
 			\min\menge{c_p : p \in P_{u,v}^{(k)}} & \text{wenn } P_{u,v}^{(k)} \neq \emptyset \\
 			\infty & \text{sonst}
 		\end{cases}$
+	\end{itemize}
+
+	\textbf{Initialisierung}: 
+	\vspace{-\baselineskip}
+	\begin{equation*}
+		D_G^{(0)} = mA_G = \min\menge{A_G, \mathbf{0}_n} = \begin{cases}
+			c(u,v) & \text{wenn } u \neq v, (u,v) \in E \\
+			0 & \text{wenn } u = v \\
+			\infty & \text{sonst}
+		\end{cases}
+	\end{equation*}
 	
-		\bigskip
-		
-		\item \textbf{Initialisierung}: $D_G^{(0)} = mA_G = \min\menge{A_G, \mathbf{0}_n} = \begin{cases}
-		c(u,v) & \text{wenn } u \neq v, (u,v) \in E \\
-		0 & \text{wenn } u = v \\
-		\infty & \text{sonst}
-		\end{cases}$
-		\item \textbf{Rekursion}:
+	\textbf{Rekursion}:
 		\begin{equation*}
 			\small
 			\setlength{\arraycolsep}{1pt}
@@ -87,7 +92,8 @@
 				&=& \min \Big\{ & \text{alt} & , & \text{Zeile} & + & \text{Spalte} & \Big\}
 			\end{array}
 		\end{equation*}
-	\end{itemize}
+	
+	\textbf{Ende}: $D_G = D_G^{(n)}$ mit $n = \abs{V}$
 \end{frame}
 
 \begin{frame} \frametitle{Abstraktion: algebraisches Pfadproblem}
@@ -103,7 +109,7 @@
 			\item Pfadoperation $\odot$ entlang der Pfade
 			\item Akkumulationsoperation $\oplus$
 		\end{itemize}
-		\item \textbf{Ergebnis:} allgemeine algebraische Struktur --- Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1})$
+		\item \textbf{Ergebnis:} allgemeine algebraische Struktur \\ Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1})$
 	\end{itemize}
 
 	\centering
@@ -121,62 +127,141 @@
 \end{frame}
 
 \begin{frame} \frametitle{Floyd-Warshall $\to$ Aho-Hopcraft-Ullmann}
-	\begin{itemize}
-		\item modifizierte Adjazenzmatrix $mA_G = \begin{cases}
-		A_G(u,v) & \text{wenn } u \neq v \\
-		A_G(u,v) \oplus \mathbf{1} & \text{wenn } u = v
-		\end{cases}$
-		\item \textbf{Initialisierung}: $D_G^{(0)} = mA_G$
-		\item \textbf{Rekursion}:
-		\begin{equation*} \small
-		\boxed{\begin{aligned}
-			&D_G^{(k+1)}(u,v) \\
-			= \enskip &D_G^{(k)}(u,v) \textcolor{cdorange}{\oplus} \brackets{D_G^{(k)}(u,k+1) \textcolor{cdpurple}{\odot} (D_G^{(k)}(k+1,k+1))^\ast \textcolor{cdpurple}{\odot} D_G^{(k)}(k+1,v)}
-			\end{aligned}}
-		\end{equation*}
-		\color{cdgray}
-		\item vgl. dazu Floyd-Warshall:
+	\small
+	modifizierte Adjazenzmatrix
+	\begin{equation*}
+		mA_G = \begin{cases}
+			A_G(u,v) & \text{wenn } u \neq v \\
+			A_G(u,v) \oplus \mathbf{1} & \text{wenn } u = v
+		\end{cases}
+	\end{equation*}
+
+	\textbf{Initialisierung}: $D_G^{(0)} = mA_G$
+
+	\textbf{Rekursion}:
+	\begin{equation*} \small
+	\boxed{\begin{aligned}
+		&D_G^{(k+1)}(u,v) \\
+		= \enskip &D_G^{(k)}(u,v) \textcolor{cdorange}{\oplus} \brackets{D_G^{(k)}(u,k+1) \textcolor{cdpurple}{\odot} (D_G^{(k)}(k+1,k+1))^\ast \textcolor{cdpurple}{\odot} D_G^{(k)}(k+1,v)}
+		\end{aligned}}
+	\end{equation*}
+	
+	\textcolor{cdgray!70}{%
+		vgl. dazu Floyd-Warshall:
 		\begin{equation*}
 			\begin{aligned}
 				&D_G^{(k+1)}(u,v) \\
-				= \enskip &\textcolor{cdorange}{\min}\menge{D_G^{(k)}(u,v) , D_G^{(k)}(u,k+1) \textcolor{cdpurple}{\boldsymbol{+}}
-				0
-				\textcolor{cdpurple}{\boldsymbol{+}}
+				= \enskip &\textcolor{cdorange}{\min}\menge{D_G^{(k)}(u,v) , D_G^{(k)}(u,k+1) \,
+				\textcolor{cdpurple}{\boldsymbol{+}} \,
+				0 \,
+				\textcolor{cdpurple}{\boldsymbol{+}} \,
 				D_G^{(k)}(k+1,v)}
 			\end{aligned}
-			\end{equation*}
-	\end{itemize}
+		\end{equation*}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame} \frametitle{Aufgabe 1}
 	\begin{minipage}{\dimexpr0.4\linewidth-\fboxrule-\fboxsep}
-		\includegraphics[width=\linewidth]{./tut12_task1-graph.pdf}
+		\begin{center}
+			\scalebox{0.9}{%
+				\begin{tikzpicture}[->, 
+					>=stealth', 
+					initial text=, 
+%					node distance=3cm, 
+					semithick,
+					]
+										
+					\node[state] (1) {$1$}; 
+					\node[state] (2) [below right = 2cm and 1cm of 1] {$2$};
+					\node[state] (3) [below left = 2cm and 1cm of 1] {$3$};
+					\node[state] (5) [below = 2cm of 3] {$5$};
+					\node[state] (4) [below = 2cm of 2] {$4$};
+				
+					% Kanten
+					\tikzset{every node/.style = {font=\footnotesize, color=cdblue}};
+					
+					\path[->]  
+					(1) edge[bend left]  node[right] {$5$} (2)
+					(1) edge[bend right] node[left]  {$3$} (3)
+					(3) edge[bend left]  node[above] {$4$} (2)
+					(2) edge[bend left]  node[below] {$4$} (3)
+					(2) edge             node[right] {$3$} (4)
+					(4) edge             node[above] {$4$} (5)
+					(3) edge             node[left]  {$2$} (5);
+			\end{tikzpicture}}
+		\end{center}
 	\end{minipage}
 	\pause
 	\begin{minipage}{\dimexpr0.6\linewidth-\fboxrule-\fboxsep}
 		\centering
-		\textbf{Teil (a)} : \\
-		$(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = (\N_\infty, \max, \min, 0, \infty)$
+		\textbf{Teil (a)} :
+		\begin{equation*}
+			(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = (\N_\infty, \max, \min, 0, \infty)
+		\end{equation*}
 		
-		\hspace{1em} \pause
+		\vspace{2em} \pause
 		
-		\textbf{Teil (b)} : \\
-		$mA_G = D_G^{(0)} = \begin{pmatrix}
-		\infty & 5      & 3      & 0      & 0 \\
-		0      & \infty & 4      & 3      & 0 \\
-		0      & 4      & \infty & 0      & 2 \\
-		0      & 0      & 0      & \infty & 4 \\
-		0      & 0      & 0      & 0      & \infty \\
-		\end{pmatrix}$	
+		\textbf{Teil (b)} :
+		\begin{equation*}
+			mA_G = D_G^{(0)} = \begin{pmatrix}
+				\infty & 5      & 3      & 0      & 0 \\
+				0      & \infty & 4      & 3      & 0 \\
+				0      & 4      & \infty & 0      & 2 \\
+				0      & 0      & 0      & \infty & 4 \\
+				0      & 0      & 0      & 0      & \infty \\
+			\end{pmatrix}
+		\end{equation*}	
 	\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Aufgabe 1}
+	\textbf{Teil (c)} :
+	\small
+	
+	Zunächst einige Hinweise zur Notation und zum Verständnis...
+	
+	\pause
+	
+	\textbf{Verallgemeinerte Operationen}:
+	
+	\begin{minipage}[t]{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\centering
+		allgemeine Akkumulationsoperation:
+		\begin{equation*}
+			s_0 \oplus s_1 \oplus \dots  \oplus s_n
+			= \sideset{}{^\oplus}\sum_{i \in \menge{0, \dots, n}} s_i
+		\end{equation*}
+	\end{minipage}
+	\begin{minipage}[t]{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\centering
+		gewöhnliche \\
+		Addition:
+		\begin{equation*}
+			s_0 + s_1 + \dots + s_n = \sum_{i \in \menge{0, 1, \dots, n}} s_i
+		\end{equation*}
+	\end{minipage}
+	
+	\pause
+	
+	\textbf{Potenz}: induktiv definiert über 
+	\begin{equation*}
+		s^0 \defeq \mathbf{1} \qquad \text{ und } \qquad s^{n+1} \defeq s \odot s^n
+	\end{equation*}
+	
+	\pause
+	
+	\textbf{Stern}:
+	\begin{equation*}
+		s^\ast =  \sideset{}{^\oplus}\sum_{n \in \N} s^n
+	\end{equation*}
 \end{frame}
 
 \begin{frame} \frametitle{Aufgabe 1}
 	\textbf{Teil (c)} :
 	\small
-	Laut Vorlesung gilt $s^\ast = \sum_{n \in \N}^{\oplus} s^n$ mit $s^0 = \mathbf{1}$ und $s^{n+1} = s \odot s^n$. Im Semiring $(\N_\infty, \max, \min, 0, \infty)$ gilt:
+	Laut Vorlesung gilt $s^\ast = \sum_{n \in \N}^{\oplus} s^n$ mit $s^0 = \mathbf{1}$ und $s^{n+1} = s \odot s^n$. Im Semiring $(S, \oplus, \odot, \mathbf{0}, \mathbf{1}) = (\N_\infty, \max, \min, 0, \infty)$ gilt:
 	\begin{itemize}
 		\item $s^0 = \mathbf{1} = \infty$
 		\item $s^1 = s \odot s^0 = \min \menge{s, \infty} = s$
@@ -189,11 +274,12 @@
 	\begin{equation*}
 	\begin{aligned}
 		D_G^{(k+1)}(u,v) &= \max \menge{D_G^{(k)}(u,v) , \min\menge{D_G^{(k)}(u,k+1) , \infty, D_G^{(k)}(k+1,v)}} \\
-		&=	\max \menge{D_G^{(k)}(u,v) , \min\menge{D_G^{(k)}(u,k+1), D_G^{(k)}(k+1,v)}} \\
+		&=	\max \menge{D_G^{(k)}(u,v) , \min\menge{D_G^{(k)}(u,k+1), \phantom{ \infty, } D_G^{(k)}(k+1,v)}} \\
 		&= 	D_G^{(k)}(u,v) \oplus \brackets{D_G^{(k)}(u,k+1) \odot D_G^{(k)}(k+1,v)}
 	\end{aligned}
 	\end{equation*}
 \end{frame}
+
 \begin{frame} \frametitle{Aufgabe 1}
 	\textbf{Teil (d)} :
 	\begin{itemize}
