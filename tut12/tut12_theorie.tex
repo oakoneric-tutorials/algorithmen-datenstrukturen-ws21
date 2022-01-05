@@ -15,30 +15,13 @@
 \usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
 \usepackage{parskip}  	% split paragraphs by vspace instead of intendations
 \usepackage[onehalfspacing]{setspace} % increase row-space
-\usepackage[title,titletoc]{appendix}
 
 \usepackage[utf8]{inputenc}
 \usepackage{chngcntr}
 \usepackage{eufrak}
-
 \usepackage{lmodern}
-\usepackage{ulem} 
-
-\usepackage{fancyhdr} 	% customize header / footer
-\usepackage{tocloft}
-%\renewcommand{\cfttoctitlefont}{\titlefont\Huge\bfseries}
-%\renewcommand{\cftbeforetoctitleskip}{0pt}
-%\renewcommand{\cftchapnumwidth}{2em}
-%\renewcommand{\cftsecindent}{2em}
-%\renewcommand{\cftsecnumwidth}{2em}
-%\renewcommand{\cftsubsecindent}{4em}
-
-% further support for different equation setting
-\usepackage{cancel}
 
 \usepackage[table,dvipsnames]{tudscrcolor}
-\usepackage{tabularx} 	% tabularx-environment (explicitly set width of columns)
-\usepackage{booktabs}	% improved rules
 
 \newcommand{\begriff}[1]{\textbf{#1}}
 \newcommand{\person}[1]{\textsc{#1}}
@@ -77,31 +60,16 @@
 \newcommand{\satzende}{\enskip \text{.}}
 \newcommand{\komma}{\enskip \text{,}}
 
-\newtheoremstyle{mystyle}% name of the style to be used
-	{6pt}% spaceabove. E.g.: 3pt
-	{6pt}% spacebelow. E.g.: 3pt
-	{\itshape}% bodyfont
-	{}% indent
-	{\bfseries}% headfont
-	{.}% headpunctuation
-	{ }% space after theorem head; " " = normal interword space
-	{}% Manually specify head
-\theoremstyle{mystyle}
-
-\newtheorem{definition}{Definition}
-\newtheorem{beispiel}[definition]{Beispiel}
-\newtheorem{hinweis}[definition]{Hinweis}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           REFERENCES                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage[
-type={CC},
-modifier={by-nc-sa},
-version={4.0},
+	type={CC},
+	modifier={by-nc-sa},
+	version={4.0},
 ]{doclicense}
+
 
 \usepackage[unicode,bookmarks=true]{hyperref}
 \hypersetup{
@@ -115,10 +83,31 @@ version={4.0},
 	linkcolor=cdblue,
 	urlcolor=cdblue
 }
-\usepackage[nameinlink]{cleveref}
-\crefname{beispiel}{Beispiel}{Beispiele}
-
 \usepackage{bookmark}		% pdf-bookmarks
+
+\usepackage[nameinlink]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            THEOREMS                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheoremstyle{mystyle}% name of the style to be used
+{6pt}% spaceabove. E.g.: 3pt
+{6pt}% spacebelow. E.g.: 3pt
+{\itshape}% bodyfont
+{}% indent
+{\bfseries}% headfont
+{.}% headpunctuation
+{ }% space after theorem head; " " = normal interword space
+{}% Manually specify head
+\theoremstyle{mystyle}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{beispiel}[definition]{Beispiel}
+\newtheorem{hinweis}[definition]{Hinweis}
+
+\crefname{beispiel}{Beispiel}{Beispiele}
+\Crefname{beispiel}{Beispiel}{Beispiele}
 
 
 
