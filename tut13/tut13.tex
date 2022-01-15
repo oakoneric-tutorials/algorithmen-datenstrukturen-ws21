@@ -51,28 +51,34 @@
 
 \begin{document}	
 	\title{Algorithmen und Datenstrukturen}
-	\subtitle{Übung 13: EM-Algorithmus}
+	\subtitle{Übung 13: Wahrscheinlichkeiten}
 	\author{Eric Kunze}
 	\email{eric.kunze@mailbox.tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{05.02.2021}
+	\date{\formatdate{17}{1}{2022}}
 
 	\maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{EM-Algorithmus}
+\section{Aufgabe 1}
 
 \begin{frame} \frametitle{Wahrscheinlichkeitstheorie}
 	\justifying \footnotesize
-	Wir betrachten ein Zufallsexperiment mit
+	Wir betrachten ein Zufallsexperiment $(X,p)$ mit
 	\begin{itemize}
 		\item Ergebnismenge $X$ und
 		\item einer Funktion $p \colon X \to [0,1]$ mit $\sum_{x \in X} p(x) = 1$ (\textbf{Wahrscheinlichkeitsverteilung von $X$})
 	\end{itemize}
+	\pause
+	
 	Die Menge aller Wahrscheinlichkeitsverteilungen über $X$ sei $\mathcal{M}(X)$. Jede Teilmenge $\mathcal{M} \subseteq \mathcal{M}(X)$ heißt \textbf{Wahrscheinlichkeitsmodell}.
+	\pause
+	
+	Ein Wahrscheinlichkeitsmodell $\mathcal{M}$ heißt \textbf{beschränkt}, falls $\mathcal{M} \neq \mathcal{M}(X)$; andernfalls unbeschränkt.
+	\pause
 	
 	Führen wir nun zwei Zufallsexperimente nacheinander aus. Wir nehmen dabei an, dass die beiden Experimente \textit{unabhängig} voneinander sind. Folge das erste Experiment einer Verteilung $p_1 \in \mathcal{M}(X_1)$ und das zweite Experiment einer Verteilung $p_2 \in \mathcal{M}(X_2)$, dann ist $p_1 \times p_2 \in \mathcal{M}(X_1 \times X_2)$ eine Verteilung auf der Ergebnismenge $X_1 \times X_2$ unseres zweistufigen Experiments:
 	\begin{equation*}
@@ -83,6 +89,109 @@
 	\end{center}
 \end{frame}
 
+\begin{frame} \frametitle{Aufgabe 1 -- Teil (a)}
+	\justifying\small
+	Beschreiben Sie die folgenden Zufallsexperimente formal durch Angabe einer Ergebnismenge und der zugehörigen Wahrscheinlichkeitsverteilung:
+	\begin{enumerate}[1.]
+		\item Das Werfen von zwei fairen Würfeln.
+		\item Das gleichzeitige Ziehen von jeweils einer Kugel aus zwei Urnen. Die erste Urne hat
+		zwei weiße und drei schwarze Kugeln. Die zweite Urne hat eine rote, zwei blaue Kugeln
+		und drei grüne Kugeln. Die Kugeln sind nicht unterscheidbar (abgesehen von ihrer
+		Farbe).
+		\item Das sechsmalige Werfen einer Münze, die mit Wahrscheinlichkeit $0.3$ Kopf ergibt.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 -- Teil (a)}
+	\footnotesize
+	\begin{enumerate}[1.]
+		\item Werfen von zwei fairen Würfeln: 
+		\begin{equation*}
+			X = \menge{1, \dots, 6} \times \menge{1, \dots, 6} \qquad \und \qquad p(a,b) = \frac{1}{36} \quad \forall (a,b) \in X
+		\end{equation*}
+		\item $2$-Urnenmodell: Durch das \textit{gleichzeitige} Ziehen können wir beide Versuche \textit{unabhängig} voneinander betrachten.
+		\begin{align*}
+			&\text{Urne 1:} & X_1 &= \menge{w, s} &&\text{mit} & p_1(w) &= \frac{2}{5} & p_1(s) &= \frac{3}{5} \\
+			&\text{Urne 2:} & X_2 &= \menge{r,g,b} &&\text{mit} & p_2(r) &= \frac{1}{6} & p_2(g) &= \frac{1}{2}  & p_2(b) &= \frac{1}{3}
+		\end{align*} 
+		Der Gesamtversuch ist damit das unabhängige Produkt 
+		\begin{align*}
+			X &\defeq X_1 \times X_2 \\
+			p(a,b) &\defeq (p_1 \times p_2)(a,b) = p_1(a) * p_2(b) \quad \forall (a,b) \in X_1 \times X_2
+		\end{align*}
+		Genauer ist
+		\begin{align*}
+			p(w,r) &= \frac{1}{15} & p(w,g) &= \frac{2}{15} & p(w, b) &= \frac{1}{5} \\
+			p(s,r) &= \frac{1}{10} & p(s,g) &= \frac{1}{5} & p(s, b) &= \frac{3}{10}
+		\end{align*}
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\footnotesize
+	\begin{enumerate}[1.]
+		\setcounter{enumi}{2}
+		\item \enquote{Unfairer} Münzwurf: Für \textit{einen} Münzwurf gilt
+		\begin{align*}
+			X' &= \menge{K, Z} \\
+			p'(K) &= 0.3 \\
+			p'(Z) &= 0.7.
+		\end{align*}
+		Für den sechsfachen Münzwurf gilt dementsprechend
+		\begin{align*}
+			X &\defeq (X')^6 = \menge{K, Z}^6 \\
+			p(x) &\defeq p((x_1, x_2, \dots, x_6)) \\
+			&= (p' \times \dots \times p')(x_1, \dots, x_6) \\
+			&= p'(x_1) * p'(x_2) * \dots * p'(x_6)
+		\end{align*}
+		Genauer kann man auch schreiben, dass 
+		\begin{equation*}
+			p(x) = 0.3^{K(x)} * 0.7^{Z(x)}
+		\end{equation*}
+		wobei $K(x)$ die Anzahl der Kopfwürfe in der Wurffolge $x$ beschreibt und analog $Z(x)$ die Anzahl der Zahlwürfe.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 -- Teil (b)}
+	\justifying\small
+	Geben Sie für die folgenden Szenarien jeweils die Ergebnismenge und das Wahrscheinlichkeitsmodell an. Bestimmen Sie ob das Wahrscheinlichkeitsmodell beschränkt oder unbeschränkt ist. Wenn das Modell beschränkt ist, dann geben Sie eine Wahrscheinlichkeitsverteilung an, die sich nicht in dem Modell befindet.
+	\begin{enumerate}[1.]
+		\item Das Werfen eines Tetraeders mit beliebigen Eigenschaften.
+		\item Das Werfen eines Würfels, bei dem alle Seiten mit gerader Augenzahl die gleiche
+		Wahrscheinlichkeit haben.
+		\item Das zweimalige Werfen der gleichen Münze, diese darf beliebige Eigenschaften haben.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 -- Teil (b)}
+	\justifying\scriptsize
+	\begin{enumerate}[1.]
+		\item \textbf{Werfen eines Tetraeders mit beliebigen Eigenschaften:}
+		Sind die Seiten mit $1, \dots, 4$ durchnummeriert, dann ist $X = \menge{1, \dots, 4}$. Das Modell ist unbeschränkt, d.h. es gilt $\mathcal{M} = \mathcal{M}(X)$.
+		\item \textbf{Werfen eines Würfels, bei dem alle geraden Augenzahlen gleiche Wahrscheinlichkeit haben:}
+		Es ist $X = \menge{1, \dots, 6}$ und das Modell ist gegeben durch
+		\begin{equation*}
+			\mathcal{M} = \menge{p \in \mathcal{M}(X) : p(2) = p(4) = p(6)}.
+		\end{equation*}
+		Klarerweise gibt es Verteilungen, die nicht in $\mathcal{M}$ liegen, z.B. $p$ mit 
+		\begin{equation*}
+			p(1) = p(2) = p(3) = \frac{1}{12} \qquad \und \qquad p(4) = p(5) = p(6) = \frac{1}{4}.
+		\end{equation*}
+		Somit ist $\mathcal{M}$ beschränkt.
+		\item \textbf{Zweimaliger Münzwurf:} Es ist
+		\begin{equation*}
+			X = \menge{K,Z}^2 = \menge{K,Z} \times \menge{K, Z} = \menge{(K,K), (K,Z), (Z,K), (Z,Z)}.
+		\end{equation*}
+		Da zweimal die selbe Münze geworfen wird, gilt
+		\begin{equation*}
+			\mathcal{M} = \menge{p \times p : p \in \mathcal{M}(\menge{K, Z})}.
+		\end{equation*}
+		Jede Verteilung $p$ mit $p(K,Z) \neq p(Z,K)$ liegt nicht in $\mathcal{M}$ und $\mathcal{M}$ ist somit beschränkt.
+	\end{enumerate}
+\end{frame}
+
+\section{Aufgabe 2}
+
 \begin{frame} \frametitle{Korpora und Korpuswahrscheinlichkeiten}
 	\justifying \footnotesize
 	Oftmals wissen wir aber die zugrundeliegende Verteilung nicht, sondern können lediglich die Ergebnisse des Experiments wahrnehmen. Zählen wir diese Beobachtungen, dann nennen wir das einen \textbf{$X$-Korpus} modelliert durch eine Funktion $h \colon X \to \R^{\ge 0}$.
@@ -90,185 +199,91 @@
 	\begin{equation*}
 		L(h,p) = \prod_{x \in X} p(x)^{h(x)} .
 	\end{equation*} 
-	Nun kennen wir aber die Verteilung $p$ nicht und müssen sie daher aus den beobachteten Daten schätzen. Dies macht der\textbf{ Maximum-Likelihood-Schätzer} (MLE)
+	Kennen wir nun aber die Verteilung $p$ nicht, müssen wir sie aus den beobachteten Daten schätzen. Dies macht zum Beispiel der \textbf{Maximum-Likelihood-Schätzer} (MLE)
 	\begin{equation*}
 		\operatorname{mle}(h,\mathcal{M}) = \argmax_{p \in \mathcal{M}} L(h,p) .
 	\end{equation*}
-	Solange das Modell unbeschränkt gewählt wird, d.h. es werden alle Verteilungen über $X$ zugelassen, dann wird der MLE zur relativen Häufigkeit von $h$.
+	Solange das Modell unbeschränkt gewählt wird, d.h. es werden alle Verteilungen über $X$ zugelassen, dann ist der MLE genau die relative Häufigkeit von $h$.
 \end{frame}
 
-\begin{frame} \frametitle{Marginalisierung}
+\begin{frame} \frametitle{Aufgabe 2 -- Teil (a)}
+	\justifying \small
+	Sie haben zwei Würfel, davon ist einer fair und bei dem anderen ist jede der Seiten mit geraden Augenzahlen drei Mal so wahrscheinlich wie jede der Seiten mit ungeraden Augenzahlen. Sie wählen einen der beiden Würfel aus und erzeugen bei zehn Würfen das folgende Korpus:
+	\begin{equation*}
+		h(1) = 1, \quad h(2) = 2, \quad h(3) = 2, \quad h(4) = 1, \quad h(5) = 1, \quad h(6) = 3.
+	\end{equation*}
+	Welchen Würfel haben Sie wahrscheinlich gegriffen?	
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 2 -- Teil (a)}
 	\justifying \footnotesize
-	Wir betrachten die zwei Ergebnismengen $X_1$ und $X_2$. Das Modell sei gegeben durch das unabhängige Produkt der Modelle auf $X_1$ und der Modelle auf $X_2$, d.h. $\mathcal{M} = \menge{ p_1 \times p_2 : p_1 \in \mathcal{M}(X_1), p_2 \in \mathcal{M}(X_2)}$. Weiter sei $h$ ein $X_1 \times X_2$-Korpus. Die Teilkorpora $h_1$ auf $X_1$ und $h_2$ auf $X_2$ erhalten wir durch \textbf{Marginalisierung}
-	\begin{equation*}
-		\begin{aligned}
-			h_1(x_1) &= \sum_{x_2 \in X_2} h(x_1, x_2) & \text{für alle } x_1 &\in X_1 \\
-			h_2(x_2) &= \sum_{x_1 \in X_1} h(x_1, x_2) & \text{für alle } x_2 &\in X_2 \\
-		\end{aligned}
-	\end{equation*}
-	Die Summen entsprechen dabei gerade Zeilen- bzw. Spaltensummen, wenn man $h$ in einer Tabelle notiert.
-	\begin{equation*}
-		\begin{array}{|c||ccc|c|}
-		\hline
-			X_1 \backslash X_2 & \alpha & \dots & \omega & \\ \hline \hline
-			a & h(a,\alpha) & \dots & h(a,\omega) & h_1(a) \\
-			\vdots &\vdots & \ddots & \vdots & \vdots \\
-			z & h(z,\alpha) & \dots & h(z,\omega) & h_1(z) \\ \hline
-			& h_2(\alpha) & \dots & h_2(\omega) & \\ \hline
-		\end{array}
-	\end{equation*}
+	Wir bestimmen für die Verteilungen der beiden Würfel die jeweilige Likelihood unter dem Korpus $h$.
 	
-	Der MLE auf $X_1 \times X_2$ ist außerdem gegeben durch die relativen Häufigkeiten auf den Teilkorpora, d.h. $\operatorname{mle}(h, \mathcal{M}) = \rfe(h_1) \times \rfe(h_2)$.	
-\end{frame}
-
-\begin{frame} \frametitle{Unvollständige Daten}
-	\justifying \footnotesize
-	Bisher sind wir davon ausgegangen, dass die Daten stets vollständig waren, d.h. wir konnten jedes Ergebnis beobachten. In der Realität können aber oftmals nur Gruppen von Ergebnissen beobachtet werden; z.B. gewinne oder verliere ich bei einem Spiel. Wir wissen aber nicht, welches Ergebnis genau erzielt wurde. 
-	
-	Sei $Y$ die Menge der Beobachtungen. Die Beobachtungsfunktion $\operatorname{yield} \colon X \to Y$ ordnet jedem Ergebnis seine Beobachtung zu. Die Umkehrabbildung ordnet dann jeder Beobachtung eine Menge von möglichen Ergebnissen zu, die zu dieser Beobachtung führen, d.h.
+	\textbf{Verteilung des ersten Würfels:}
 	\begin{equation*}
-		A \colon Y \to \mathcal{P}(X) \quad \text{mit} \quad A(y) = \menge{x \in X: \operatorname{yield}(x) = y} .
+		p_1(1) = p_1(2) = p_1(3) = p_1(4) = p_1(5) = p_1(6) = \frac{1}{6}
 	\end{equation*}
-	Diese Funktion heißt \textbf{Analysator}. 
-	
-	Sei $h$ ein $Y$-Korpus, d.h. $h$ zählt Beobachtungen (nicht Ergebnisse). Die \textbf{Korpuswahrscheinlichkeit} / \textbf{Likelihood} von $h$ unter einer Verteilung $p$ ist 
+	\textbf{Verteilung des zweiten Würfels:}
 	\begin{equation*}
-		L(h,p) = \prod_{y \in Y} \left( \sum_{x \in A(y)} p(x) \right)^{h(y)}.
+		p_2(1) = p_2(3) = p_2(5) = \frac{1}{12} 
+		\qquad \und \qquad 
+		p_2(2) = p_2(4) = p_2(6) = \frac{1}{4}
 	\end{equation*}
-	Der MLE bleibt wie er war: $\operatorname{mle}(h,\mathcal{M}) = \argmax_{p \in \mathcal{M}} L(h,p)$.
-\end{frame}
 
-\begin{frame} \frametitle{EM-Algorithmus}
-	\begin{description}
-		\item[E-Schritt] \textit{Expectation} \\
-		Bestimmte die versteckten Eigenschaften mithilfe der Parameter aus der vorherigen Iteration.
-		\begin{equation*}
-			h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x)}
-		\end{equation*}
-		\item[M-Schritt] \textit{Maximization} \\
-		Bestimmte die neuen Parameter mithilfe des vollständigen Eigenschaften aus dem E-Schritt.
-		\begin{equation*}
-			p_i = \argmax_{p \in \mathcal{M}} L(h_i, p)
-		\end{equation*}
-	\end{description}
-\end{frame}
-
-\section{Übungsblatt 13 \\ \textit{Aufgabe 1}}
-
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
-	\justifying \small	
-	Das Spiel wird gewonnen, wenn beide Münzen auf der gleichen Seite landen.
-	
-	\pause
-	
-	Damit ist der Analysator $A \colon \menge{\win, \nowin} \to \mathcal{P}(X)$ gegeben durch
-	\begin{equation*}
-		\begin{aligned}
-			A(\win) &= \menge{x \in X: \yield(x) = \win} \\
-					&= \menge{(K,K), (Z,Z)} \\
-			A(\nowin) &= \menge{x \in X: \yield(x) = \nowin} \\
-					  &= \menge{(K,Z), (Z,K),(R,K),(R,Z)}
-		\end{aligned}
-	\end{equation*}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (b)}
-	\justifying \small 
-	Wir können nur die Beobachtungen $\win$ und $\nowin$ feststellen. 
-	
-	Wir spielen das Spiel $24$ Mal und gewinnen $6$ Mal. Gesucht ist nun der $Y$-Korpus $h$, d.h. wie oft beobachten wir die Ereignisse $\win$ und $\nowin$.
-	\pause
-	\begin{equation*}
-		h(\win) = 6 \qquad\qquad h(\nowin) = 18
-	\end{equation*}
-\end{frame}
-
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
-	\justifying \footnotesize
-	Gegeben ist nun eine initiale Wahrscheinlichkeitsverteilung $q_0 = q_0^1 \times q_0^2$ über den vollständigen Daten mit
+	\textbf{Likelihoods:}
 	\begin{align*}
-	q_0^1(K) &= \frac{2}{5} & q_0^2(K) &= \frac{1}{3} \\
-	q_0^1(R) &= \frac{1}{5} \\ \pause
-	\Rightarrow
-	q_0^1(Z) &= 1 - q_0^1(K) - q_0^1(R) = \frac{2}{5} 
-	&
-	q_0^2(Z) &= 1 - q_0^1(K) = \frac{2}{3}
-	\end{align*}
-	
-	\pause
-	Mit dem unabhängigen Produkt erhalten wir
-	\begin{align*}
-	q_0(K,K) &= q_0^1(K) \cdot q_0^2(K) = \frac{2}{15} 
-	& q_0(K,Z) &= q_0^1(K) \cdot q_0^2(Z) = \frac{4}{15} \\
-	q_0(Z,K) &= q_0^1(Z) \cdot q_0^2(K) = \frac{2}{15}
-	& q_0(Z,Z) &= q_0^1(Z) \cdot q_0^2(Z) = \frac{4}{15} \\
-	q_0(R,K) &= q_0^1(R) \cdot q_0^2(K) = \frac{1}{15}
-	& q_0(R,Z) &= q_0^1(R) \cdot q_0^2(Z) = \frac{2}{15}
+		L(h, p_1) = \prod_{x=1}^6 p_1(x)^{h(x)} 
+		&= \brackets{\frac{1}{6}}^1 * \brackets{\frac{1}{6}}^2 * \brackets{\frac{1}{6}}^2 * \brackets{\frac{1}{6}}^1 * \brackets{\frac{1}{6}}^1 * \brackets{\frac{1}{6}}^3 \\
+		&= \brackets{\frac{1}{6}}^{\abs{h}} = \brackets{\frac{1}{6}}^{10} \\
+		L(h, p_2) = \prod_{x=1}^6 p_2(x)^{h(x)} 
+		&= \brackets{\frac{1}{12}}^1 * \brackets{\frac{1}{4}}^2 * \brackets{\frac{1}{12}}^2 * \brackets{\frac{1}{4}}^1 * \brackets{\frac{1}{12}}^1 * \brackets{\frac{1}{4}}^3 \\
+		&= \brackets{\frac{1}{12}}^4 * \brackets{\frac{1}{4}}^{6} 
 	\end{align*}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
-	\justifying \footnotesize
-	\textbf{E-Schritt:} Erweiterung von $h$ auf $h_1$ mit folgender Formel:
-	\begin{equation*}
-		h_1(x) = h(\yield(x)) \cdot \frac{q_0(x)}{\sum\limits_{x' \in A(\yield(x))} q_0(x')}
-	\end{equation*}
-	\pause
-	Damit ergibt sich dann zum Beispiel für das Ergebnis $(K,K)$
+\begin{frame}
+	\footnotesize
+	Wir müssen nun noch entscheiden, welche der beiden Likelihoods größer ist -- vorzugsweise ohne Taschenrechner:
 	\begin{align*}
-		h_1(K,K) &= h(\win) \cdot \frac{q_0(K,K)}{\sum\limits_{x' \in \menge{(K,K),(Z,Z)}} q_0(x')} \\
-		&= h(\win) \cdot \frac{q_0(K,K)}{q_0(K,K) + q_0(Z,Z)} \\
-		&= 6 \cdot \frac{\frac{2}{15}}{\frac{2}{15} + \frac{4}{15}} \\
-		&= 2
+		&&L(h, p_1) &> L(h, p_2)  \\
+		\equivalent 
+		&&\brackets{\frac{1}{6}}^{10} &> \brackets{\frac{1}{12}}^4 * \brackets{\frac{1}{4}}^6 = \brackets{\frac{1}{3} * \frac{1}{4}}^4 * \brackets{\frac{1}{4}}^6 = \brackets{\frac{1}{3}}^4 * \brackets{\frac{1}{4}}^{10} \\
+		\equivalent && \brackets{\frac{1}{6} * \frac{4}{1}}^{10} = \brackets{\frac{2}{3}}^{10} &> \brackets{\frac{1}{3}}^4 \\
+		\equivalent &&
+		3^4 &> \brackets{\frac{3}{2}}^{10} = \frac{3^{10}}{2^{10}} \\
+		\equivalent && 3^{-6} &> \frac{1}{2^{10}} \\
+		\equivalent && 2^{10} &> 3^6 \\
+		\equivalent && 2^{5} &> 3^3 \\
+		\equivalent && 32 &> 27 \\
 	\end{align*}
-	\pause
-	Mit gleicher Rechnung erhalten wir für die restlichen Ereignisse
-	\begin{align*}
-		 && h_1(Z,K) &= 4 & h_1(R,K) &= 2 \\
-		h_1(K,Z) &= 8 & h_1(Z,Z) &= 4 & h_1(R,Z) &= 4
-	\end{align*}
+	Somit ist also $L(h, p_1) > L(h, p_2)$ und wir haben sicherlich den ersten Würfel genutzt.
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (d)}
-	\justifying \footnotesize
-	\textbf{M-Schritt:} Bestimmung der Teilkorpora $h_1^1$ bzw. $h_1^2$ durch \textit{Marginalisierung}:
-	\pause
+\begin{frame} \frametitle{Aufgabe 2 -- Teil (b)}
+	\justifying \small
+	Sie haben zwei Würfel, davon ist einer fair und bei dem anderen ist jede der Seiten mit geraden Augenzahlen drei Mal so wahrscheinlich wie jede der Seiten mit ungeraden Augenzahlen. Sie wählen einen der beiden Würfel aus und erzeugen bei zehn Würfen das folgende Korpus:
 	\begin{equation*}
-		\begin{array}{|c||cc|c|}
-		\hline
-		X_1 \backslash X_2 & K & Z & \\ \hline \hline
-		K & h_1(K,K) & h_1(K,Z) & h_1^1(K) \\
-		Z & h_1(Z,K) & h_1(Z,Z) & h_1^1(Z) \\
-		R & h_1(R,K) & h_1(R,Z) & h_1^1(R) \\ \hline
-		& h_1^2(K) & h_1^2(Z) & \\ \hline
-		\end{array}
-		\qquad \leadsto \qquad 
-		\begin{array}{|c||cc|c|}
-		\hline
-		X_1 \backslash X_2 & K & Z & \\ \hline \hline
-		K & 2 &  8 & 10 \\
-		Z & 4 &  4 &  8 \\
-		R & 2 &  4 &  6 \\ \hline
-		& 8 & 16 & 24 \\ \hline
-		\end{array}
+		h(1) = 1, \quad h(2) = 2, \quad h(3) = 2, \quad h(4) = 1, \quad h(5) = 1, \quad h(6) = 3.
 	\end{equation*}
+	Nehmen Sie an, dass Sie das Korpus $h$ mit einem beliebigen Würfel erzeugt haben. Schätzen
+	Sie die Wahrscheinlichkeitsverteilung des Würfels ab.
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (e)}
+\begin{frame} \frametitle{Aufgabe 2 -- Teil (b)}
 	\justifying \footnotesize
-	Nun bestimmen wir noch die relativen Häufigkeiten mit der Formel
+	Der Würfel wurde beliebig gewählt, d.h. ohne besondere Eigenschaften oder Anforderungen an die Verteilung. Damit betrachten wir das unbeschränkte Wahrscheinlichkeitsmodell $\mathcal{M} = \mathcal{M}(X)$. Wir erhalten den Maximum Likelihood Schätzer $\hat{p}$ von $h$ und $\mathcal{M}$ als relative Häufigkeiten:
 	\begin{equation*}
-		\rfe(h)(x) \defeq \frac{h(x)}{\abs{h}} \quad \mit \quad \abs{h} \defeq \sum_{x \in X} h(x)
+		\hat{p} = \operatorname{mle}(h, \mathcal{M}(X)) = \operatorname{rfe}(h).
 	\end{equation*}
-	\pause
-	Wenden wir dies nun auf $h_1$ und $h_2$ an, so erhalten wir
+	Für die relativen Häufigkeiten gilt die Formel
+	\begin{equation*}
+		\rfe(h)(x) \defeq \frac{h(x)}{\abs{h}} \quad \mit \quad \abs{h} \defeq \sum_{x \in X} h(x).
+	\end{equation*}
+	Es gilt also
 	\begin{align*}
-		q_1^1(K) = \rfe(h_1^1)(K) &= \frac{h_1^1(K)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{10}{24} = \frac{5}{12} \\
-		q_1^1(Z) = \rfe(h_1^1)(Z) &= \frac{h_1^1(Z)}{h_1(K) + h_1^1(Z) + h_1^1(R)} = \frac{8}{24} = \frac{1}{3} \\
-		q_1^1(R) = \rfe(h_1^1)(R) &= \frac{h_1^1(R)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{6}{24} = \frac{1}{4} \\
-		\intertext{und}
-		q_1^2(K) = \rfe(h_1^2)(K) &= \frac{h_1^2(K)}{h_1^2(K) + h_1^2(Z)} = \frac{8}{24} = \frac{1}{3} \\
-		q_1^2(Z) = \rfe(h_1^2)(Z) &= \frac{h_1^2(Z)}{h_1^2(K) + h_1^2(Z)} = \frac{16}{24} = \frac{2}{3} \\
+		\hat{p}(1) &= \frac{1}{10} & \hat{p}(4) &= \frac{1}{10} \\
+		\hat{p}(2) &= \frac{2}{10} & \hat{p}(5) &= \frac{1}{10} \\
+		\hat{p}(3) &= \frac{2}{10} & \hat{p}(6) &= \frac{3}{10}
 	\end{align*}
 \end{frame}
 
