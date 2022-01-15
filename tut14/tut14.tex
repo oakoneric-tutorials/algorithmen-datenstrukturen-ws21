@@ -1,0 +1,275 @@
+\documentclass{beamer}
+\usepackage{../tut-slides}
+\usepackage{../mathoperatorsAuD}
+
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{wasysym}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+%\usepackage[inline]{enumitem} 		%customize label
+%\newcommand{\labelitemi}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+%\newcommand{\labelitemii}{$\vartriangleright$}
+%\newcommand{\labelitemiii}{--}
+\setbeamertemplate{itemize item}{\raisebox{1pt}{\scalebox{.9}{$\blacktriangleright$}}}
+\setbeamertemplate{itemize subitem}{$\vartriangleright$}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{tabu}
+\newcommand*\head{\rowfont{\bfseries}}
+\newcommand*{\tw}{\rowfont{\ttfamily}}
+\renewcommand{\tabularxcolumn}[1]{>{\hspace{0pt}}m{#1}}
+\usepackage{multirow}
+
+\usepackage{cancel}
+
+\usepackage{empheq}
+\newcommand*\widefbox[1]{\fbox{\hspace{2em} #1 \hspace{2em}}}
+
+\usepackage{tcolorbox}
+\newtcolorbox{mymathbox}[1][]{colback=white, sharp corners, #1}
+
+\usepackage{xcolor}
+\usepackage{MnSymbol}
+
+\newcommand{\col}[1]{\textcolor{cdpurple}{#1}}
+\newcolumntype{R}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage{tabularx}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+
+\usepackage{ragged2e}
+\usepackage{csquotes}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\DeclareMathOperator{\yield}{yield}
+\DeclareMathOperator{\win}{Gewinn}
+\DeclareMathOperator{\nowin}{kein Gewinn}
+\DeclareMathOperator{\rfe}{rfe}
+
+
+\begin{document}	
+	\title{Algorithmen und Datenstrukturen}
+	\subtitle{Übung 13: EM-Algorithmus}
+	\author{Eric Kunze}
+	\email{eric.kunze@mailbox.tu-dresden.de}
+	\city{TU Dresden}
+%	\institute{Lehrstuhl für Grundlagen der Programmierung}
+	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
+	\date{05.02.2021}
+
+	\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{EM-Algorithmus}
+
+\begin{frame} \frametitle{Wahrscheinlichkeitstheorie}
+	\justifying \footnotesize
+	Wir betrachten ein Zufallsexperiment mit
+	\begin{itemize}
+		\item Ergebnismenge $X$ und
+		\item einer Funktion $p \colon X \to [0,1]$ mit $\sum_{x \in X} p(x) = 1$ (\textbf{Wahrscheinlichkeitsverteilung von $X$})
+	\end{itemize}
+	Die Menge aller Wahrscheinlichkeitsverteilungen über $X$ sei $\mathcal{M}(X)$. Jede Teilmenge $\mathcal{M} \subseteq \mathcal{M}(X)$ heißt \textbf{Wahrscheinlichkeitsmodell}.
+	
+	Führen wir nun zwei Zufallsexperimente nacheinander aus. Wir nehmen dabei an, dass die beiden Experimente \textit{unabhängig} voneinander sind. Folge das erste Experiment einer Verteilung $p_1 \in \mathcal{M}(X_1)$ und das zweite Experiment einer Verteilung $p_2 \in \mathcal{M}(X_2)$, dann ist $p_1 \times p_2 \in \mathcal{M}(X_1 \times X_2)$ eine Verteilung auf der Ergebnismenge $X_1 \times X_2$ unseres zweistufigen Experiments:
+	\begin{equation*}
+		(p_1 \times p_2)(a,b) = p_1(a) \cdot p_2(b) .
+	\end{equation*}
+	\begin{center}
+		\enquote{Einzelwahrscheinlichkeiten multiplizieren / erste Pfadregel}
+	\end{center}
+\end{frame}
+
+\begin{frame} \frametitle{Korpora und Korpuswahrscheinlichkeiten}
+	\justifying \footnotesize
+	Oftmals wissen wir aber die zugrundeliegende Verteilung nicht, sondern können lediglich die Ergebnisse des Experiments wahrnehmen. Zählen wir diese Beobachtungen, dann nennen wir das einen \textbf{$X$-Korpus} modelliert durch eine Funktion $h \colon X \to \R^{\ge 0}$.
+	Man definiert die \textbf{Korpuswahrscheinlichkeit} / \textbf{Likelihood} von $h$ unter einer Verteilung $p$ als
+	\begin{equation*}
+		L(h,p) = \prod_{x \in X} p(x)^{h(x)} .
+	\end{equation*} 
+	Nun kennen wir aber die Verteilung $p$ nicht und müssen sie daher aus den beobachteten Daten schätzen. Dies macht der\textbf{ Maximum-Likelihood-Schätzer} (MLE)
+	\begin{equation*}
+		\operatorname{mle}(h,\mathcal{M}) = \argmax_{p \in \mathcal{M}} L(h,p) .
+	\end{equation*}
+	Solange das Modell unbeschränkt gewählt wird, d.h. es werden alle Verteilungen über $X$ zugelassen, dann wird der MLE zur relativen Häufigkeit von $h$.
+\end{frame}
+
+\begin{frame} \frametitle{Marginalisierung}
+	\justifying \footnotesize
+	Wir betrachten die zwei Ergebnismengen $X_1$ und $X_2$. Das Modell sei gegeben durch das unabhängige Produkt der Modelle auf $X_1$ und der Modelle auf $X_2$, d.h. $\mathcal{M} = \menge{ p_1 \times p_2 : p_1 \in \mathcal{M}(X_1), p_2 \in \mathcal{M}(X_2)}$. Weiter sei $h$ ein $X_1 \times X_2$-Korpus. Die Teilkorpora $h_1$ auf $X_1$ und $h_2$ auf $X_2$ erhalten wir durch \textbf{Marginalisierung}
+	\begin{equation*}
+		\begin{aligned}
+			h_1(x_1) &= \sum_{x_2 \in X_2} h(x_1, x_2) & \text{für alle } x_1 &\in X_1 \\
+			h_2(x_2) &= \sum_{x_1 \in X_1} h(x_1, x_2) & \text{für alle } x_2 &\in X_2 \\
+		\end{aligned}
+	\end{equation*}
+	Die Summen entsprechen dabei gerade Zeilen- bzw. Spaltensummen, wenn man $h$ in einer Tabelle notiert.
+	\begin{equation*}
+		\begin{array}{|c||ccc|c|}
+		\hline
+			X_1 \backslash X_2 & \alpha & \dots & \omega & \\ \hline \hline
+			a & h(a,\alpha) & \dots & h(a,\omega) & h_1(a) \\
+			\vdots &\vdots & \ddots & \vdots & \vdots \\
+			z & h(z,\alpha) & \dots & h(z,\omega) & h_1(z) \\ \hline
+			& h_2(\alpha) & \dots & h_2(\omega) & \\ \hline
+		\end{array}
+	\end{equation*}
+	
+	Der MLE auf $X_1 \times X_2$ ist außerdem gegeben durch die relativen Häufigkeiten auf den Teilkorpora, d.h. $\operatorname{mle}(h, \mathcal{M}) = \rfe(h_1) \times \rfe(h_2)$.	
+\end{frame}
+
+\begin{frame} \frametitle{Unvollständige Daten}
+	\justifying \footnotesize
+	Bisher sind wir davon ausgegangen, dass die Daten stets vollständig waren, d.h. wir konnten jedes Ergebnis beobachten. In der Realität können aber oftmals nur Gruppen von Ergebnissen beobachtet werden; z.B. gewinne oder verliere ich bei einem Spiel. Wir wissen aber nicht, welches Ergebnis genau erzielt wurde. 
+	
+	Sei $Y$ die Menge der Beobachtungen. Die Beobachtungsfunktion $\operatorname{yield} \colon X \to Y$ ordnet jedem Ergebnis seine Beobachtung zu. Die Umkehrabbildung ordnet dann jeder Beobachtung eine Menge von möglichen Ergebnissen zu, die zu dieser Beobachtung führen, d.h.
+	\begin{equation*}
+		A \colon Y \to \mathcal{P}(X) \quad \text{mit} \quad A(y) = \menge{x \in X: \operatorname{yield}(x) = y} .
+	\end{equation*}
+	Diese Funktion heißt \textbf{Analysator}. 
+	
+	Sei $h$ ein $Y$-Korpus, d.h. $h$ zählt Beobachtungen (nicht Ergebnisse). Die \textbf{Korpuswahrscheinlichkeit} / \textbf{Likelihood} von $h$ unter einer Verteilung $p$ ist 
+	\begin{equation*}
+		L(h,p) = \prod_{y \in Y} \left( \sum_{x \in A(y)} p(x) \right)^{h(y)}.
+	\end{equation*}
+	Der MLE bleibt wie er war: $\operatorname{mle}(h,\mathcal{M}) = \argmax_{p \in \mathcal{M}} L(h,p)$.
+\end{frame}
+
+\begin{frame} \frametitle{EM-Algorithmus}
+	\begin{description}
+		\item[E-Schritt] \textit{Expectation} \\
+		Bestimmte die versteckten Eigenschaften mithilfe der Parameter aus der vorherigen Iteration.
+		\begin{equation*}
+			h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x)}
+		\end{equation*}
+		\item[M-Schritt] \textit{Maximization} \\
+		Bestimmte die neuen Parameter mithilfe des vollständigen Eigenschaften aus dem E-Schritt.
+		\begin{equation*}
+			p_i = \argmax_{p \in \mathcal{M}} L(h_i, p)
+		\end{equation*}
+	\end{description}
+\end{frame}
+
+\section{Übungsblatt 13 \\ \textit{Aufgabe 1}}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
+	\justifying \small	
+	Das Spiel wird gewonnen, wenn beide Münzen auf der gleichen Seite landen.
+	
+	\pause
+	
+	Damit ist der Analysator $A \colon \menge{\win, \nowin} \to \mathcal{P}(X)$ gegeben durch
+	\begin{equation*}
+		\begin{aligned}
+			A(\win) &= \menge{x \in X: \yield(x) = \win} \\
+					&= \menge{(K,K), (Z,Z)} \\
+			A(\nowin) &= \menge{x \in X: \yield(x) = \nowin} \\
+					  &= \menge{(K,Z), (Z,K),(R,K),(R,Z)}
+		\end{aligned}
+	\end{equation*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (b)}
+	\justifying \small 
+	Wir können nur die Beobachtungen $\win$ und $\nowin$ feststellen. 
+	
+	Wir spielen das Spiel $24$ Mal und gewinnen $6$ Mal. Gesucht ist nun der $Y$-Korpus $h$, d.h. wie oft beobachten wir die Ereignisse $\win$ und $\nowin$.
+	\pause
+	\begin{equation*}
+		h(\win) = 6 \qquad\qquad h(\nowin) = 18
+	\end{equation*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
+	\justifying \footnotesize
+	Gegeben ist nun eine initiale Wahrscheinlichkeitsverteilung $q_0 = q_0^1 \times q_0^2$ über den vollständigen Daten mit
+	\begin{align*}
+	q_0^1(K) &= \frac{2}{5} & q_0^2(K) &= \frac{1}{3} \\
+	q_0^1(R) &= \frac{1}{5} \\ \pause
+	\Rightarrow
+	q_0^1(Z) &= 1 - q_0^1(K) - q_0^1(R) = \frac{2}{5} 
+	&
+	q_0^2(Z) &= 1 - q_0^1(K) = \frac{2}{3}
+	\end{align*}
+	
+	\pause
+	Mit dem unabhängigen Produkt erhalten wir
+	\begin{align*}
+	q_0(K,K) &= q_0^1(K) \cdot q_0^2(K) = \frac{2}{15} 
+	& q_0(K,Z) &= q_0^1(K) \cdot q_0^2(Z) = \frac{4}{15} \\
+	q_0(Z,K) &= q_0^1(Z) \cdot q_0^2(K) = \frac{2}{15}
+	& q_0(Z,Z) &= q_0^1(Z) \cdot q_0^2(Z) = \frac{4}{15} \\
+	q_0(R,K) &= q_0^1(R) \cdot q_0^2(K) = \frac{1}{15}
+	& q_0(R,Z) &= q_0^1(R) \cdot q_0^2(Z) = \frac{2}{15}
+	\end{align*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
+	\justifying \footnotesize
+	\textbf{E-Schritt:} Erweiterung von $h$ auf $h_1$ mit folgender Formel:
+	\begin{equation*}
+		h_1(x) = h(\yield(x)) \cdot \frac{q_0(x)}{\sum\limits_{x' \in A(\yield(x))} q_0(x')}
+	\end{equation*}
+	\pause
+	Damit ergibt sich dann zum Beispiel für das Ergebnis $(K,K)$
+	\begin{align*}
+		h_1(K,K) &= h(\win) \cdot \frac{q_0(K,K)}{\sum\limits_{x' \in \menge{(K,K),(Z,Z)}} q_0(x')} \\
+		&= h(\win) \cdot \frac{q_0(K,K)}{q_0(K,K) + q_0(Z,Z)} \\
+		&= 6 \cdot \frac{\frac{2}{15}}{\frac{2}{15} + \frac{4}{15}} \\
+		&= 2
+	\end{align*}
+	\pause
+	Mit gleicher Rechnung erhalten wir für die restlichen Ereignisse
+	\begin{align*}
+		 && h_1(Z,K) &= 4 & h_1(R,K) &= 2 \\
+		h_1(K,Z) &= 8 & h_1(Z,Z) &= 4 & h_1(R,Z) &= 4
+	\end{align*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (d)}
+	\justifying \footnotesize
+	\textbf{M-Schritt:} Bestimmung der Teilkorpora $h_1^1$ bzw. $h_1^2$ durch \textit{Marginalisierung}:
+	\pause
+	\begin{equation*}
+		\begin{array}{|c||cc|c|}
+		\hline
+		X_1 \backslash X_2 & K & Z & \\ \hline \hline
+		K & h_1(K,K) & h_1(K,Z) & h_1^1(K) \\
+		Z & h_1(Z,K) & h_1(Z,Z) & h_1^1(Z) \\
+		R & h_1(R,K) & h_1(R,Z) & h_1^1(R) \\ \hline
+		& h_1^2(K) & h_1^2(Z) & \\ \hline
+		\end{array}
+		\qquad \leadsto \qquad 
+		\begin{array}{|c||cc|c|}
+		\hline
+		X_1 \backslash X_2 & K & Z & \\ \hline \hline
+		K & 2 &  8 & 10 \\
+		Z & 4 &  4 &  8 \\
+		R & 2 &  4 &  6 \\ \hline
+		& 8 & 16 & 24 \\ \hline
+		\end{array}
+	\end{equation*}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1 --- Teil (e)}
+	\justifying \footnotesize
+	Nun bestimmen wir noch die relativen Häufigkeiten mit der Formel
+	\begin{equation*}
+		\rfe(h)(x) \defeq \frac{h(x)}{\abs{h}} \quad \mit \quad \abs{h} \defeq \sum_{x \in X} h(x)
+	\end{equation*}
+	\pause
+	Wenden wir dies nun auf $h_1$ und $h_2$ an, so erhalten wir
+	\begin{align*}
+		q_1^1(K) = \rfe(h_1^1)(K) &= \frac{h_1^1(K)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{10}{24} = \frac{5}{12} \\
+		q_1^1(Z) = \rfe(h_1^1)(Z) &= \frac{h_1^1(Z)}{h_1(K) + h_1^1(Z) + h_1^1(R)} = \frac{8}{24} = \frac{1}{3} \\
+		q_1^1(R) = \rfe(h_1^1)(R) &= \frac{h_1^1(R)}{h_1^1(K) + h_1^1(Z) + h_1^1(R)} = \frac{6}{24} = \frac{1}{4} \\
+		\intertext{und}
+		q_1^2(K) = \rfe(h_1^2)(K) &= \frac{h_1^2(K)}{h_1^2(K) + h_1^2(Z)} = \frac{8}{24} = \frac{1}{3} \\
+		q_1^2(Z) = \rfe(h_1^2)(Z) &= \frac{h_1^2(Z)}{h_1^2(K) + h_1^2(Z)} = \frac{16}{24} = \frac{2}{3} \\
+	\end{align*}
+\end{frame}
+
+\end{document}
