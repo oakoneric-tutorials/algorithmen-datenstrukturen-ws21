@@ -46,38 +46,86 @@
 \DeclareMathOperator{\yield}{yield}
 \DeclareMathOperator{\win}{Gewinn}
 \DeclareMathOperator{\nowin}{kein Gewinn}
+\DeclareMathOperator{\mle}{mle}
 \DeclareMathOperator{\rfe}{rfe}
+
+\DeclareMathOperator{\schere}{Schere}
+\DeclareMathOperator{\stein}{Stein}
+\DeclareMathOperator{\papier}{Papier}
+
 
 
 \begin{document}	
 	\title{Algorithmen und Datenstrukturen}
-	\subtitle{Übung 13: EM-Algorithmus}
+	\subtitle{Übung 14: EM-Algorithmus}
 	\author{Eric Kunze}
 	\email{eric.kunze@mailbox.tu-dresden.de}
 	\city{TU Dresden}
 %	\institute{Lehrstuhl für Grundlagen der Programmierung}
 	\titlegraphic{\includegraphics[width=2cm]{../TUD-white.pdf}}
-	\date{05.02.2021}
+	\date{24.01.2022}
 
 	\maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{EM-Algorithmus}
+\section{Aufgabe 1}
+
+%\begin{frame} \frametitle{Wahrscheinlichkeitstheorie}
+%	\justifying \footnotesize
+%	\setbeamerfont{itemize/enumerate body}{size={\footnotesize}}
+%	\setbeamerfont{itemize/enumerate subbody}{size={\footnotesize}}
+%	
+%	Wir betrachten ein Zufallsexperiment mit Ergebnismenge $X$ und einer Wahrscheinlichkeitsverteilung $p$. Eine Menge $\mathcal{M}$ von Wahrscheinlichkeitsverteilungen heißt Wahrscheinlichkeitsmodell.
+%	
+%	\textbf{Praktisches Problem:} \\
+%	nur \textit{beobachtete} Ergebnisse verfügbar; genaue Verteilung unbekannt
+%	
+%	\begin{itemize}
+%		\item \textbf{$X$-Korpus} $h : X \to \R^{\ge 0}$ 
+%		\begin{itemize}
+%			\item $h$ zählt beobachtete Ergebnisse; absolute Häufigkeiten
+%		\end{itemize}
+%		\item Wie gut passt eine Verteilung $p$ zu einem Korpus $h$?
+%		\begin{itemize}
+%			\item Likelihood von $h$ unter $p$:
+%			\begin{equation*}
+%				L(h,p) = \prod_{x \in X} p(x)^{h(x)} .
+%			\end{equation*}
+%		\end{itemize}
+%		\item \textbf{Schätzung der Verteilung} aus beobachteten Ergebnissen
+%		\begin{itemize}
+%			\item wähle die am besten passendste Verteilung
+%			\item Maximum-Likelihood-Schätzer: 
+%			\begin{equation*}
+%				\operatorname{mle}(h,\mathcal{M}) = \argmax_{p \in \mathcal{M}} L(h,p) .
+%			\end{equation*}
+%			\item Falls $\mathcal{M} = \mathcal{M}(X)$: $\mle(h, \mathcal{M}) = \rfe(h)$
+%		\end{itemize}
+%	\end{itemize}
+%\end{frame}
 
 \begin{frame} \frametitle{Wahrscheinlichkeitstheorie}
 	\justifying \footnotesize
-	Wir betrachten ein Zufallsexperiment mit
+	Wir betrachten ein Zufallsexperiment $(X,p)$ mit
 	\begin{itemize}
 		\item Ergebnismenge $X$ und
 		\item einer Funktion $p \colon X \to [0,1]$ mit $\sum_{x \in X} p(x) = 1$ (\textbf{Wahrscheinlichkeitsverteilung von $X$})
 	\end{itemize}
-	Die Menge aller Wahrscheinlichkeitsverteilungen über $X$ sei $\mathcal{M}(X)$. Jede Teilmenge $\mathcal{M} \subseteq \mathcal{M}(X)$ heißt \textbf{Wahrscheinlichkeitsmodell}.
+	\pause
 	
-	Führen wir nun zwei Zufallsexperimente nacheinander aus. Wir nehmen dabei an, dass die beiden Experimente \textit{unabhängig} voneinander sind. Folge das erste Experiment einer Verteilung $p_1 \in \mathcal{M}(X_1)$ und das zweite Experiment einer Verteilung $p_2 \in \mathcal{M}(X_2)$, dann ist $p_1 \times p_2 \in \mathcal{M}(X_1 \times X_2)$ eine Verteilung auf der Ergebnismenge $X_1 \times X_2$ unseres zweistufigen Experiments:
+	Die Menge aller Wahrscheinlichkeitsverteilungen über $X$ sei $\mathcal{M}(X)$. Jede Teilmenge $\mathcal{M} \subseteq \mathcal{M}(X)$ heißt \textbf{Wahrscheinlichkeitsmodell}.
+	\pause
+	
+	Ein Wahrscheinlichkeitsmodell $\mathcal{M}$ heißt \textbf{beschränkt}, falls $\mathcal{M} \neq \mathcal{M}(X)$; andernfalls unbeschränkt.
+	\pause
+	
+	Führen wir nun zwei Zufallsexperimente nacheinander aus und nehmen dabei an, dass die beiden Experimente \textit{unabhängig} voneinander sind. Folge das erste Experiment einer Verteilung $p_1 \in \mathcal{M}(X_1)$ und das zweite Experiment einer Verteilung $p_2 \in \mathcal{M}(X_2)$, dann ist $p_1 \times p_2 \in \mathcal{M}(X_1 \times X_2)$ eine Verteilung auf der Ergebnismenge $X_1 \times X_2$ unseres zweistufigen Experiments:
+	\vspace{-.5\baselineskip}
 	\begin{equation*}
-		(p_1 \times p_2)(a,b) = p_1(a) \cdot p_2(b) .
+		(p_1 \times p_2)(a,b) = p_1(a) * p_2(b) .
 	\end{equation*}
+	\vspace{-1.5\baselineskip}
 	\begin{center}
 		\enquote{Einzelwahrscheinlichkeiten multiplizieren / erste Pfadregel}
 	\end{center}
@@ -97,30 +145,6 @@
 	Solange das Modell unbeschränkt gewählt wird, d.h. es werden alle Verteilungen über $X$ zugelassen, dann wird der MLE zur relativen Häufigkeit von $h$.
 \end{frame}
 
-\begin{frame} \frametitle{Marginalisierung}
-	\justifying \footnotesize
-	Wir betrachten die zwei Ergebnismengen $X_1$ und $X_2$. Das Modell sei gegeben durch das unabhängige Produkt der Modelle auf $X_1$ und der Modelle auf $X_2$, d.h. $\mathcal{M} = \menge{ p_1 \times p_2 : p_1 \in \mathcal{M}(X_1), p_2 \in \mathcal{M}(X_2)}$. Weiter sei $h$ ein $X_1 \times X_2$-Korpus. Die Teilkorpora $h_1$ auf $X_1$ und $h_2$ auf $X_2$ erhalten wir durch \textbf{Marginalisierung}
-	\begin{equation*}
-		\begin{aligned}
-			h_1(x_1) &= \sum_{x_2 \in X_2} h(x_1, x_2) & \text{für alle } x_1 &\in X_1 \\
-			h_2(x_2) &= \sum_{x_1 \in X_1} h(x_1, x_2) & \text{für alle } x_2 &\in X_2 \\
-		\end{aligned}
-	\end{equation*}
-	Die Summen entsprechen dabei gerade Zeilen- bzw. Spaltensummen, wenn man $h$ in einer Tabelle notiert.
-	\begin{equation*}
-		\begin{array}{|c||ccc|c|}
-		\hline
-			X_1 \backslash X_2 & \alpha & \dots & \omega & \\ \hline \hline
-			a & h(a,\alpha) & \dots & h(a,\omega) & h_1(a) \\
-			\vdots &\vdots & \ddots & \vdots & \vdots \\
-			z & h(z,\alpha) & \dots & h(z,\omega) & h_1(z) \\ \hline
-			& h_2(\alpha) & \dots & h_2(\omega) & \\ \hline
-		\end{array}
-	\end{equation*}
-	
-	Der MLE auf $X_1 \times X_2$ ist außerdem gegeben durch die relativen Häufigkeiten auf den Teilkorpora, d.h. $\operatorname{mle}(h, \mathcal{M}) = \rfe(h_1) \times \rfe(h_2)$.	
-\end{frame}
-
 \begin{frame} \frametitle{Unvollständige Daten}
 	\justifying \footnotesize
 	Bisher sind wir davon ausgegangen, dass die Daten stets vollständig waren, d.h. wir konnten jedes Ergebnis beobachten. In der Realität können aber oftmals nur Gruppen von Ergebnissen beobachtet werden; z.B. gewinne oder verliere ich bei einem Spiel. Wir wissen aber nicht, welches Ergebnis genau erzielt wurde. 
@@ -138,7 +162,114 @@
 	Der MLE bleibt wie er war: $\operatorname{mle}(h,\mathcal{M}) = \argmax_{p \in \mathcal{M}} L(h,p)$.
 \end{frame}
 
+\begin{frame} \frametitle{Aufgabe 1}
+	\small
+	Bestimmen Sie für die folgenden Szenarien die Menge $X$ der Ergebnisse und die Menge $Y$ der
+	Beobachtungen. Bestimmen Sie außerdem den Analysator.
+	\begin{enumerate}[(a)]
+		\item Werfen zweier unabhängiger Münzen. Sie können nur beobachten, ob beide Münzen dieselbe oder verschiedene Seiten zeigen.
+		\item Werfen zweier Würfel, wobei Sie nur die Summe der Augenzahlen beobachten.
+		\item Zwei Spieler spielen Schere-Stein-Papier. Sie beobachten lediglich, welcher Spieler gewonnen hat bzw. ob das Spiel unentschieden ausging.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1}
+	\footnotesize
+	\begin{enumerate}[(a)]
+		\item \textbf{zweimaliger Münzwurf -- Beobachtung der Gleichheit}
+		\begin{equation*}
+			X = \menge{K,Z} \times \menge{K,Z} \qquad \und \qquad
+			Y = \menge{\operatorname{gleich}, \operatorname{ungleich}} 
+		\end{equation*}
+	
+		Der Analysator ordnet jeder Beobachtung $y \in Y$ die Menge der Ergebnisse aus $X$ zu, die zur Beobachtung $y$ führen, also
+		\begin{align*}
+			A(\operatorname{gleich}) &= \menge{(K,K), (Z,Z)} \\
+			A(\operatorname{ungleich}) &= \menge{(K,Z), (Z,K)}.			
+		\end{align*}
+		\item \textbf{zweimaliger Würfelwurf -- Beobachtung der Augensumme}
+		\begin{equation*}
+			X = \menge{1, \dots, 6} \times \menge{1, \dots, 6}
+			\qquad \und \qquad
+			Y = \menge{2, \dots, 12} 
+		\end{equation*}
+		Analysator: $A(x) = \menge{(i,j) \in X : i + j = x}$, d.h. konkret
+		\begin{align*}
+			A(2) &= \menge{(1,1)} \\
+			A(3) &= \menge{(1,2), (2,1)} \\
+			A(4) &= \menge{(1,3), (3,1), (2,2)} \\
+			&\vdots \\
+			A(12) &= \menge{(6,6)}			
+		\end{align*}
+	\end{enumerate}
+\end{frame}
+
+\begin{frame} \frametitle{Aufgabe 1}
+	\footnotesize
+	\begin{enumerate}[(a)]
+		\setcounter{enumi}{2}
+		\item \textbf{Schere, Stein, Papier -- Beobachtung des Gewinners}
+		\begin{align*}
+			X &= \menge{\operatorname{Schere}, \operatorname{Stein}, \operatorname{Papier}}^2 \\
+			Y &= \menge{\operatorname{Spieler1}, \operatorname{Spieler2}, \operatorname{Unentschieden}} 
+		\end{align*}
+		
+		Analysator:
+		\begin{align*}
+			A(\operatorname{Spieler1}) &= \menge{(\schere, \papier), (\stein, \schere), (\papier, \stein)} \\
+			A(\operatorname{Spieler2}) &= \menge{(\papier, \schere), (\schere, \stein), (\stein, \papier)} \\
+			A(\operatorname{Unentschieden}) &= \menge{(\papier, \papier), (\stein, \stein), (\schere, \schere)}		
+		\end{align*}
+	\end{enumerate}
+\end{frame}
+
+\section{Aufgabe 2}
+
+\begin{frame} \frametitle{Probleme mit unvollständigen Daten}
+	\justifying \footnotesize 
+	\textbf{Problem 1:} Wir wollen die Verteilung der \textit{Ergebnisse} schätzen. Um den MLE nutzen zu können, brauchen wir aber einen $X$-Korpus. Jedoch ist uns nur ein $Y$-Korpus gegeben, da wir nur \textit{Beobachtungen} wahrnehmen können. 
+	
+	\textbf{Ausweg:} Erweiterung des $Y$-Korpus $h$ zu einem $X$-Korpus $h_1$ auf vollständigen Daten
+	\begin{equation*}
+		h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x)} \qquad \text{ für alle } x \in X
+	\end{equation*}
+	Dazu benötigen wir eine gewisse Vorkenntnis mit der Verteilung $p_{i-1}$, die wir aus dem vorherigen Iterationsschritt bzw. einer initialen Vermutung bekommen.
+	
+	\textbf{Problem 2:} Oftmals haben wir zwei unabhängige Teilversuche mit Ergebnismengen $X_1$ und $X_2$ und das zugehörige Modell besteht ebenso aus dem unabhängigen Produkt der Modelle auf den Teilversuchen. Wie wir sehen werden, ist dann ein $X$-Korpus $h$ nicht unbedingt hilfreich -- wir wollen vielmehr die Teilkorpora $h^1$ auf $X_1$ und $h^2$ auf $X_2$. 
+	
+	\textbf{Ausweg:} Marginalisierung
+\end{frame}
+
+\begin{frame} \frametitle{Marginalisierung}
+	\justifying \footnotesize
+	Wir betrachten die zwei Ergebnismengen $X_1$ und $X_2$. Das Modell sei gegeben durch das unabhängige Produkt der Modelle auf $X_1$ und der Modelle auf $X_2$, d.h. $\mathcal{M} = \menge{ p^1 \times p^2 : p^1 \in \mathcal{M}(X_1), p^2 \in \mathcal{M}(X_2)}$. Weiter sei $h$ ein $X_1 \times X_2$-Korpus. Die Teilkorpora $h^1$ auf $X_1$ und $h^2$ auf $X_2$ erhalten wir durch \textbf{Marginalisierung}
+	\begin{equation*}
+		\begin{aligned}
+			h^1(x_1) &= \sum_{x_2 \in X_2} h(x_1, x_2) & \text{für alle } x_1 &\in X_1 \\
+			h^2(x_2) &= \sum_{x_1 \in X_1} h(x_1, x_2) & \text{für alle } x_2 &\in X_2 \\
+		\end{aligned}
+	\end{equation*}
+	Die Summen entsprechen dabei gerade Zeilen- bzw. Spaltensummen, wenn man $h$ in einer Tabelle notiert.
+	\begin{equation*}
+		\begin{array}{|c||ccc|c|}
+		\hline
+			X_1 \backslash X_2 & \alpha & \dots & \omega & \\ \hline \hline
+			a & h(a,\alpha) & \dots & h(a,\omega) & h^1(a) \\
+			\vdots &\vdots & \ddots & \vdots & \vdots \\
+			z & h(z,\alpha) & \dots & h(z,\omega) & h^1(z) \\ \hline
+			& h^2(\alpha) & \dots & h^2(\omega) & \\ \hline
+		\end{array}
+	\end{equation*}
+	Der MLE auf $X_1 \times X_2$ im unbeschränkten Modell ist gegeben durch die relativen Häufigkeiten auf den Teilkorpora, d.h. $\operatorname{mle}(h, \mathcal{M}) = \rfe(h^1) \times \rfe(h^2)$.	
+\end{frame}
+
+
+
 \begin{frame} \frametitle{EM-Algorithmus}
+	\small
+	\textbf{Input:} initiale Wahrscheinlichkeitsverteilung $p_0$
+	
+	Eine Iteration des Algorithmus besteht aus den folgenden beiden Schritten:
 	\begin{description}
 		\item[E-Schritt] \textit{Expectation} \\
 		Bestimmte die versteckten Eigenschaften mithilfe der Parameter aus der vorherigen Iteration.
@@ -153,9 +284,7 @@
 	\end{description}
 \end{frame}
 
-\section{Übungsblatt 13 \\ \textit{Aufgabe 1}}
-
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (a)}
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (a)}
 	\justifying \small	
 	Das Spiel wird gewonnen, wenn beide Münzen auf der gleichen Seite landen.
 	
@@ -172,7 +301,7 @@
 	\end{equation*}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (b)}
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (b)}
 	\justifying \small 
 	Wir können nur die Beobachtungen $\win$ und $\nowin$ feststellen. 
 	
@@ -183,7 +312,7 @@
 	\end{equation*}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (c)}
 	\justifying \footnotesize
 	Gegeben ist nun eine initiale Wahrscheinlichkeitsverteilung $q_0 = q_0^1 \times q_0^2$ über den vollständigen Daten mit
 	\begin{align*}
@@ -195,7 +324,7 @@
 	q_0^2(Z) &= 1 - q_0^1(K) = \frac{2}{3}
 	\end{align*}
 	
-	\pause
+	\onslide<2->{
 	Mit dem unabhängigen Produkt erhalten wir
 	\begin{align*}
 	q_0(K,K) &= q_0^1(K) \cdot q_0^2(K) = \frac{2}{15} 
@@ -205,9 +334,10 @@
 	q_0(R,K) &= q_0^1(R) \cdot q_0^2(K) = \frac{1}{15}
 	& q_0(R,Z) &= q_0^1(R) \cdot q_0^2(Z) = \frac{2}{15}
 	\end{align*}
+	}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (c)}
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (c)}
 	\justifying \footnotesize
 	\textbf{E-Schritt:} Erweiterung von $h$ auf $h_1$ mit folgender Formel:
 	\begin{equation*}
@@ -229,7 +359,7 @@
 	\end{align*}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (d)}
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (d)}
 	\justifying \footnotesize
 	\textbf{M-Schritt:} Bestimmung der Teilkorpora $h_1^1$ bzw. $h_1^2$ durch \textit{Marginalisierung}:
 	\pause
@@ -254,7 +384,7 @@
 	\end{equation*}
 \end{frame}
 
-\begin{frame} \frametitle{Aufgabe 1 --- Teil (e)}
+\begin{frame} \frametitle{Aufgabe 2 --- Teil (e)}
 	\justifying \footnotesize
 	Nun bestimmen wir noch die relativen Häufigkeiten mit der Formel
 	\begin{equation*}
