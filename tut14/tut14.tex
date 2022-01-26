@@ -241,7 +241,7 @@
 	
 	\textbf{Ausweg:} Erweiterung des $Y$-Korpus $h$ zu einem $X$-Korpus $h_1$ auf vollständigen Daten
 	\begin{equation*}
-		h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x)} \qquad \text{ für alle } x \in X
+		h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x')} \qquad \text{ für alle } x \in X
 	\end{equation*}
 	Dazu benötigen wir eine gewisse Vorkenntnis mit der Verteilung $p_{i-1}$, die wir aus dem vorherigen Iterationsschritt bzw. einer initialen Vermutung bekommen.
 	
@@ -261,7 +261,7 @@
 		\item[E-Schritt] \textit{Expectation} \\
 		Bestimmte die versteckten Eigenschaften mithilfe der Parameter aus der vorherigen Iteration.
 		\begin{equation*}
-		h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x)}
+		h_i(x) = h(\operatorname{yield}(x)) \cdot \frac{p_{i-1}(x)}{\sum_{x' \in A(\operatorname{yield}(x))} p_{i-1}(x')}
 		\end{equation*}
 		\item[M-Schritt] \textit{Maximization} \\
 		Bestimmte die neuen Parameter mithilfe der vollständigen Eigenschaften aus dem E-Schritt.
