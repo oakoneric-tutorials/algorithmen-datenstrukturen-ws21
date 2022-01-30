@@ -33,6 +33,9 @@
 \usepackage{xcolor}
 \usepackage{MnSymbol}
 
+\usepackage{tikz}
+\usetikzlibrary{patterns,arrows, arrows.meta,calc,decorations.pathmorphing,backgrounds, positioning,fit,automata,shapes,matrix}
+
 \newcommand{\col}[1]{\textcolor{cdpurple}{#1}}
 \newcolumntype{R}[1]{>{\centering\arraybackslash}p{#1}}
 \usepackage{tabularx}
@@ -42,6 +45,8 @@
 \usepackage{csquotes}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\ghost}[1]{\raisebox{0pt}[0pt][0pt]{\makebox[0pt][l]{#1}}}
 
 %%%% EBNF-Terme %%%%
 \usepackage{../syntaxdiagrammEBNF}
@@ -66,6 +71,12 @@
 	\maketitle
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame} \frametitle{Vorgeschlagene Themen}
+	\tableofcontents
+\end{frame}
+
+
 
 \section{Fixpunktsemantik}
 
@@ -311,15 +322,15 @@
 	Ein Iterationsprozess lässt sich dann wie folgt notieren:
 	\begin{align*}
 		\begin{pmatrix} \emptyset \\ \emptyset \end{pmatrix}
-		\overset{f}{\mapsto^1}
+		\overset{f}{\mapsto^{\ghost{\tiny 1}}} \
 		\begin{pmatrix} f(\rho)(v_1) \\ f(\rho)(v_2) \end{pmatrix}
-		&\overset{f}{\mapsto^2}
+		&\overset{f}{\mapsto^{\ghost{\tiny 2}}} \
 		\begin{pmatrix} f(f(\rho))(v_1) \\ f(f(\rho))(v_2) \end{pmatrix}
-		\overset{f}{\mapsto^3}
+		\overset{f}{\mapsto^{\ghost{\tiny 3}}}
 		\dots \\
-		&\overset{f}{\mapsto^n}
+		&\overset{f}{\mapsto^{\ghost{\tiny n}}} \
 		\begin{pmatrix} f^n(\rho)(v_1) \\ f^n(\rho)(v_2) \end{pmatrix}
-		\overset{f}{\mapsto^{n+1}}
+		\overset{f}{\mapsto^{\ghost{\tiny n+1}}}
 		\dots
 	\end{align*}
 \end{frame}
@@ -348,6 +359,8 @@
 		\item Uninitialisierte Variablen werden mit Inhalt \enquote{?} notiert.
 	\end{itemize}
 \end{frame}
+
+\section{C -- Programmierung}
 
 \section{Prozessproblem}
 
@@ -384,5 +397,164 @@
 			\end{aligned}
 		\end{equation*}}
 \end{frame}
+
+\begin{frame} \frametitle{Aufgabe AGS 9.5.19}
+	\footnotesize
+	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\begin{center}
+			\scalebox{0.9}{%
+				\begin{tikzpicture}[->, 
+				>=stealth', 
+				initial text=,
+				semithick,
+				]
+				\node[state] (3) {$3$};
+				\node[state] (1) [above left = 2cm and 1cm of 3] {$1$};
+				\node[state] (2) [above right = 2cm and 1cm of 3] {$2$};
+				
+				% Kanten
+				\tikzset{every node/.style = {font=\small, color=cdblue}};
+				
+				\path[->]  
+				(1) edge             node[above] {$\menge{b}$} (2)
+				(2) edge             node[right] {$\menge{a}$} (3)
+				(3) edge[bend right] node[right] {$\menge{c}$} (1)
+				(1) edge[bend right] node[left]  {$\menge{b}$} (3);
+			\end{tikzpicture}}
+		\end{center}
+	\end{minipage} 
+	\pause
+	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\textbf{Teil (a)} : 
+		Geben Sie für $G$ die modifizierte Adjazenzmatrix $mA_G$ an. \pause
+		\begin{equation*}
+		mA_G = \begin{pmatrix}
+		\menge{\epsilon} & \menge{b} & \menge{b} \\
+		\emptyset & \menge{\epsilon} & \menge{a} \\
+		\menge{c} & \emptyset & \menge{\epsilon}
+		\end{pmatrix}
+		\end{equation*}
+	\end{minipage}
+	\pause
+	\vspace{2em}
+	
+	\textbf{Teil (b)}: Berechnen Sie für den Aho-Algorithmus die Matrizen $D_G^{(1)}$ und $D_G^{(2)}$. Sie müssen nur die Matrixelemente aufschreiben, die sich gegenüber $mA_G$ geändert haben. \pause
+	\begin{equation*}
+	D_G^{(1)} = 
+	\begin{pmatrix}
+	\menge{\epsilon} & \menge{b} & \menge{b} \\
+	\emptyset & \menge{\epsilon} & \menge{a} \\
+	\menge{c} & \alert{\menge{cb}} & \alert{\menge{cb,\epsilon}}
+	\end{pmatrix} 
+	\quad 
+	D_G^{(2)} = 
+	\begin{pmatrix}
+	\menge{\epsilon} & \menge{b} & \alert{\menge{b, ba}} \\
+	\emptyset & \menge{\epsilon} & \menge{a} \\
+	\menge{c} & \menge{cb} & \alert{\menge{cb, cba, \epsilon}}
+	\end{pmatrix} 
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+	\footnotesize
+	Ergebnis aus Teil (b):
+	\begin{equation*}
+	D_G^{(1)} = 
+	\begin{pmatrix}
+	\menge{\epsilon} & \menge{b} & \menge{b} \\
+	\emptyset & \menge{\epsilon} & \menge{a} \\
+	\menge{c} & \alert{\menge{cb}} & \alert{\menge{cb,\epsilon}}
+	\end{pmatrix} 
+	\quad 
+	D_G^{(2)} = 
+	\begin{pmatrix}
+	\menge{\epsilon} & \menge{b} & \alert{\menge{b, ba}} \\
+	\emptyset & \menge{\epsilon} & \menge{a} \\
+	\menge{c} & \menge{cb} & \alert{\menge{cb, cba, \epsilon}}
+	\end{pmatrix} 
+	\end{equation*}
+	
+	\textbf{Teil (c)}: Geben Sie die letzte Zeile der Ergebnismatrix $D_G$ des Aho-Algorithmus an. \pause
+	\begin{equation*}
+	\setlength{\arraycolsep}{1pt}
+	\begin{array}{rcccccccccc}
+	D_G(3,1) &=& D_G^{(3)}(3,1) \\
+	&=& D_G^{(2)}(3,1) &\cup& \Big\{ & D_G^{(2)}(3,3) &\cdot& (D_G^{(2)}(3,3))^\ast &\cdot& D_G^{(2)}(3,1) & \Big\}\\
+	&=& \menge{c} &\cup& \Big\{ & \menge{cb,cba,\epsilon} &\cdot& \menge{cb,cba,\epsilon}^\ast &\cdot& \menge{c} & \Big\} \\
+	&=& \multicolumn{3}{l}{\menge{cb,cba}^\ast \cdot \menge{c}}
+	\end{array}
+	\end{equation*}
+	\pause
+	\begin{equation*}
+	\setlength{\arraycolsep}{1pt}
+	\begin{array}{rcccccccccc}
+	D_G(3,2)
+	&=& D_G^{(2)}(3,2) &\cup& \Big\{ & D_G^{(2)}(3,3) &\cdot& (D_G^{(2)}(3,3))^\ast &\cdot& D_G^{(2)}(3,2) & \Big\}\\
+	&=& \menge{cb} &\cup& \Big\{ & \menge{cb,cba,\epsilon} &\cdot& \menge{cb,cba,\epsilon}^\ast &\cdot& \menge{cb} & \Big\} \\
+	&=& \multicolumn{3}{l}{\menge{cb,cba}^\ast \cdot \menge{cb}}
+	\end{array}
+	\end{equation*}
+	\pause
+	\begin{equation*}
+	\setlength{\arraycolsep}{1pt}
+	\begin{array}{rcccccccccc}
+	D_G(3,3)
+	&=& D_G^{(2)}(3,3) &\cup& \Big\{ & D_G^{(2)}(3,3) &\cdot& (D_G^{(2)}(3,3))^\ast &\cdot& D_G^{(2)}(3,3) & \Big\}\\
+	&=& \menge{cb, cba, \epsilon} &\cup& \Big\{ & \menge{cb,cba,\epsilon} &\cdot& \menge{cb,cba,\epsilon}^\ast &\cdot& \menge{cb, cba, \epsilon} & \Big\} \\
+	&=& \multicolumn{3}{l}{\menge{cb,cba}^\ast}
+	\end{array}
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+	\footnotesize
+	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		\begin{center}
+			\scalebox{0.9}{%
+				\begin{tikzpicture}[->, 
+				>=stealth', 
+				initial text=,
+				semithick,
+				]
+				\node[state] (3) {$3$};
+				\node[state] (1) [above left = 2cm and 1cm of 3] {$1$};
+				\node[state] (2) [above right = 2cm and 1cm of 3] {$2$};
+				
+				% Kanten
+				\tikzset{every node/.style = {font=\small, color=cdblue}};
+				
+				\path[->]  
+				(1) edge             node[above] {$\menge{b}$} (2)
+				(2) edge             node[right] {$\menge{a}$} (3)
+				(3) edge[bend right] node[right] {$\menge{c}$} (1)
+				(1) edge[bend right] node[left]  {$\menge{b}$} (3);
+				
+				\visible<2->{\path[->, very thick] (3) edge[bend right = 60] node[right] {$\menge{b}$} (2);}
+				
+				\end{tikzpicture}}
+		\end{center}
+	\end{minipage}
+	\begin{minipage}{\dimexpr0.5\linewidth-\fboxrule-\fboxsep}
+		Ergebnis aus Teil (c):
+		\begin{align*}
+		D_G(3,1) &= \menge{cb,cba}^\ast \cdot \menge{c} \\
+		D_G(3,2) &= \menge{cb,cba}^\ast \cdot \menge{cb} \\
+		D_G(3,3) &= \menge{cb,cba}^\ast
+		\end{align*}
+	\end{minipage}
+	\pause
+	\vspace{2em}
+	
+	\textbf{Teil (d)}:  Wie verändert sich der Eintrag$D_G(3, 3)$, wenn zu dem Graphen $G$ eine Kante von Knoten
+	$3$ zum Knoten $2$ mit dem Gewicht $\menge{b}$ zugefügt wird? \pause
+	\begin{equation*}
+	D_G(3,3) = \menge{cb, cba, ba}^\ast \gray{\leadsto (3,3, \menge{cb, cba, ba}^\ast)}
+	\end{equation*}
+\end{frame}
+
+\pause
+
+
 
 \end{document}
