@@ -89,6 +89,6 @@ acs-*.bib
 # knitr
 *-concordance.tex
 
-# aud
+# aud/prog
 *.exe
 ftp-workflow.py
